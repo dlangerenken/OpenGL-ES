@@ -21,6 +21,10 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.example.buildinggl.drawable.DrawableLine;
+import com.example.buildinggl.drawable.DrawableObject;
+import com.example.buildinggl.drawable.IDrawableObject;
+
 import melb.mSafe.model.Element3D;
 import melb.mSafe.model.Layer3D;
 import melb.mSafe.model.Model3D;
@@ -94,8 +98,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	private float mZoomLevel = 1f;
 
-	private float defaultRotationX = 100.0f; //building otherwise on the wrong side
-	private float defaultRotationZ = 180.0f; //building otherwise on the wrong side
+	private float defaultRotationX = 100.0f; // building otherwise on the wrong
+												// side
+	private float defaultRotationZ = 180.0f; // building otherwise on the wrong
+												// side
 	private float rotationX = defaultRotationX;
 	private float rotationY = 0.0f;
 	private float rotationZ = defaultRotationZ;
@@ -104,7 +110,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private float translateY = 0.0f;
 	private float translateZ = 0.0f;
 
-	private float scaleFactor = 20.0f; //no matter what scale factor -> it's not possible to zoom into the building...
+	private float scaleFactor = 20.0f; // no matter what scale factor -> it's
+										// not possible to zoom into the
+										// building...
 
 	private float ratio;
 	private float width;
@@ -112,6 +120,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	private List<IDrawableObject> drawableObjects;
 	public Model3D model3d;
+	public float heightOfBuilding = 247;
+	private float[] backgroundColor = { 210f / 255f, 228f / 255f, 255f / 255f,
+			1.0f };
+
+	private int floorColor = Color.rgb(34, 47, 60);
+	private int wallColor = Color.argb(150, 255, 255, 255);
 
 	public MyGLRenderer(Model3D model3d) {
 		this.model3d = model3d;
@@ -127,7 +141,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 		// Set the background frame color
-		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GLES20.glClearColor(backgroundColor[0], backgroundColor[1],
+				backgroundColor[2], backgroundColor[3]);
 		GLES20.glDisable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
@@ -143,14 +158,29 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 					inlineTriangles.addAll(el.triangles);
 				}
 				DrawableObject outlines = new DrawableObject(outlineTriangles,
-						Color.LTGRAY);
+						wallColor);
 				DrawableObject inlines = new DrawableObject(inlineTriangles,
-						Color.DKGRAY);
-				drawableObjects.add(outlines);
-				drawableObjects.add(inlines);
-
+						floorColor);
+				drawableObjects.add(outlines); // wall
+				drawableObjects.add(inlines); // floor
 			}
 		}
+		drawableObjects.add(getLinesOfBuilding());
+	}
+
+	private IDrawableObject getLinesOfBuilding() {
+		List<Point> points = new ArrayList<Point>();
+		Point a = new Point(0, 0, 0);
+		Point b = new Point(model3d.height, 0, 0);
+		Point c = new Point(model3d.height, model3d.width, 0);
+		Point d = new Point(0, model3d.width, 0);
+		points.add(a);
+		points.add(b);
+		points.add(c);
+		points.add(d);
+		points.add(a);
+		DrawableLine modelLine = new DrawableLine(points, Color.RED);
+		return modelLine;
 	}
 
 	@Override
@@ -169,9 +199,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		// Draw background color
 		Matrix.setIdentityM(mModelMatrix, 0);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-		// needed to rotate model - otherwise the roof is shown on the bottom
-		// rotateModel(mModelMatrix, -270f, null, null, true);
 
 		// model is in origin-solution too big
 		Matrix.scaleM(mModelMatrix, 0, modelRatio * scaleFactor, modelRatio
@@ -207,8 +234,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 			boolean rotateAroundCenter) {
 		// translation for rotating the model around its center
 		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, (model3d.width / 2f), 0,
-					(model3d.height / 2f));
+			Matrix.translateM(mModelMatrix, 0, (model3d.width / 2f),
+					heightOfBuilding / 2, (model3d.height / 2f));
 		}
 		if (x != null) {
 			Matrix.rotateM(mModelMatrix, 0, x, 1.0f, 0.0f, 0.0f);
@@ -222,8 +249,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		// translation back to the origin
 		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, -(model3d.width / 2f), 0,
-					-(model3d.height / 2f));
+			Matrix.translateM(mModelMatrix, 0, -(model3d.width / 2f),
+					-heightOfBuilding / 2, -(model3d.height / 2f));
 		}
 	}
 
@@ -376,7 +403,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 			this.translateY = y;
 		}
 		if (z != null) {
-			this.translateZ = z;
+			this.translateZ = -z;
 		}
 	}
 

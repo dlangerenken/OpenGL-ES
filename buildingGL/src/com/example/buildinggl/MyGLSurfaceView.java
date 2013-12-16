@@ -94,10 +94,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
 			isInitialized = true;
 		}
 
-		mRenderer.setTranslation(-width / 2.0f, -height / 2.0f, null);
+		mRenderer.setTranslation(-width / 2.0f, null, -height / 2.0f);
 		mRenderer.setRotation(null, null, getDegreesFromRadians(angle));
 		mRenderer.setScale(scale);
-		mRenderer.setTranslation(position.getX(), position.getY(), null);
+		mRenderer.setTranslation(position.getX(), null, position.getY());
 		return true;
 	}
 
