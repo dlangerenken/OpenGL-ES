@@ -5,47 +5,41 @@ import java.util.List;
 
 import melb.mSafe.model.Layer3D;
 import melb.mSafe.model.Model3D;
-import melb.mSafe.model.Triangle;
+import melb.mSafe.model.Node;
+import melb.mSafe.model.Way;
 import android.graphics.Color;
-import android.opengl.Matrix;
-import android.renderscript.Matrix4f;
 
-import com.example.buildinggl.GLHelper;
-import com.example.buildinggl.PathAnimation;
 import com.example.buildinggl.Point;
 
 public class Model3DGL implements IDrawableObject {
 	private List<Layer3DGL> glLayers;
 	private boolean visible = true;
 	private boolean linesVisible = true;
-	private boolean buildingVisible = false;
+	private boolean buildingVisible = true;
 	private float modelRatio = 1.0f;
 	private Model3D model;
-	private IDrawableObject linesOfBuilding;
-	private List<IDrawableObject> pathObjects;
 	private List<Point> points;
+	private IDrawableObject linesOfBuilding;
+	private List<WayGL> glWays;
 
 	public Model3DGL(Model3D model) {
 		this.model = model;
 		getModelRatio();
 		initLayers();
-		initAnimationExample();
+		initWays();
 	}
 
-	private PathAnimation animation;
+	private void initWays() {
+		glWays = new ArrayList<WayGL>();
+		List<Node> nodes = new ArrayList<Node>();
+		int counter = 0;
+		for (Point point : points) {
+			nodes.add(new Node(counter++, point.x, point.y, point.z));
+		}
+		Way way = new Way(nodes);
 
-	private void initAnimationExample() {
-		pathObjects = new ArrayList<IDrawableObject>();
-		animation = new PathAnimation(points, 20000, PathAnimation.INFINITY);
-		List<Triangle> triangles = new ArrayList<Triangle>();
-		// first part of arrow
-		triangles.add(new Triangle(new float[] { 25f, 15f, 0f, 10f, 15f, 0f,
-				0f, 0f, 0f }, new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
-		// second part of arrow
-		triangles.add(new Triangle(new float[] { 25f, 15f, 0f, 0f, 30f, 0f,
-				10f, 15f, 0f }, new float[] { 1.0f, 1.0f, 1.0f, 1.0f }));
-		IDrawableObject pathObject = new DrawableObject(triangles, Color.BLUE);
-		pathObjects.add(pathObject);
+		glWays.add(new WayGL(way, new float[] { 1.0f, 0.0f, 0.0f, 1.0f }, true,
+				10000));
 	}
 
 	public void initWithGLContext() {
@@ -53,10 +47,10 @@ public class Model3DGL implements IDrawableObject {
 			glLayer.initWithGLContext();
 		}
 		linesOfBuilding.initWithGLContext();
-		for (IDrawableObject pathObject : pathObjects) {
-			pathObject.initWithGLContext();
+
+		for (WayGL way : glWays) {
+			way.initWithGLContext();
 		}
-		animation.start();
 	}
 
 	private void initLayers() {
@@ -89,20 +83,8 @@ public class Model3DGL implements IDrawableObject {
 			if (linesVisible) {
 				linesOfBuilding.draw(mvpMatrix);
 			}
-		}
-
-		float[] animateResult = animation.animate();
-		for (IDrawableObject pathObject : pathObjects) {
-			float[] mvpCopy = new float[16];
-			for (int i = 0; i < mvpMatrix.length; i++) {
-				mvpCopy[i] = mvpMatrix[i];
-			}
-			if (animateResult != null) {
-				Matrix.translateM(mvpCopy, 0, animateResult[2],
-						animateResult[3], animateResult[4]);
-				GLHelper.rotateModel(mvpCopy, null, null, animateResult[0],
-						true, 20f, 30f, 0f);
-				pathObject.draw(mvpCopy);
+			for (WayGL way : glWays) { //TODO maybe only layer
+				way.draw(mvpMatrix);
 			}
 		}
 

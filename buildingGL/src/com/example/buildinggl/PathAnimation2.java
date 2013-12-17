@@ -37,13 +37,13 @@ public class PathAnimation2 {
 		this.nextVector = new int[size];
 		this.currentPosition = new Vector3D[size];
 		this.nextPathElement = new Vector3D[size];
+		this.currentRepeatCount = new int[size];
 		this.currentTime = new long[size];
 
 		for (int i = 0; i < size; i++) {
 			nextVector[i] = 0;
 			currentPosition[i] = pointsOnPath.get(nextVector[i]++);
-			currentTime[i] = new Date().getTime()
-					+ ((int) timeToFinish / size * i);
+			currentTime[i] = new Date().getTime();
 		}
 		calculatePathLength();
 	}
@@ -64,24 +64,22 @@ public class PathAnimation2 {
 		this.currentPosition = new Vector3D[size];
 		this.nextPathElement = new Vector3D[size];
 		this.currentTime = new long[size];
+		this.currentRepeatCount = new int[size];
 
 		for (int i = 0; i < size; i++) {
 			nextVector[i] = 0;
 			currentPosition[i] = pointsOnPath.get(nextVector[i]++);
 			nextPathElement[i] = pointsOnPath.get(nextVector[i]);
-			currentTime[i] = new Date().getTime()
-					+ ((int) timeToFinish / size * i);
+			currentTime[i] = new Date().getTime();
 		}
 		calculatePathLength();
 	}
 
 	public void start() {
 		for (int i = 0; i < size; i++) {
-			this.currentTime[i] = new Date().getTime()
-					+ ((int) timeToFinish / size * i);
+			currentTime[i] = new Date().getTime();
 			isRunnning = true;
 		}
-
 	}
 
 	public void pause() {
@@ -89,11 +87,10 @@ public class PathAnimation2 {
 	}
 
 	public void reset(int i) {
-		this.nextVector[i] = 0;
 		nextVector[i] = 0;
 		currentPosition[i] = pointsOnPath.get(nextVector[i]++);
 		nextPathElement[i] = pointsOnPath.get(nextVector[i]);
-		currentTime[i] = new Date().getTime() + ((int) timeToFinish / size * i);
+		currentTime[i] = new Date().getTime();
 	}
 
 	public void reset() {
@@ -102,8 +99,7 @@ public class PathAnimation2 {
 			nextVector[i] = 0;
 			currentPosition[i] = pointsOnPath.get(nextVector[i]++);
 			nextPathElement[i] = pointsOnPath.get(nextVector[i]);
-			currentTime[i] = new Date().getTime()
-					+ ((int) timeToFinish / size * i);
+			currentTime[i] = new Date().getTime();
 		}
 		this.isFinished = false;
 	}
@@ -123,11 +119,15 @@ public class PathAnimation2 {
 	 */
 	public float[][] animate() {
 		if (isRunnning && !isFinished) {
-			for (int i = 0; i < size; i++) {
-				long timeNow = new Date().getTime();
-				long delta = timeNow - currentTime[i];
-				currentTime[i] = timeNow;
 
+			long timeNow = new Date().getTime();
+			for (int i = 0; i < size; i++) {
+				long delta = timeNow - currentTime[i]
+						- ((int) timeToFinish / size * i);
+				if (delta < 0) {
+					continue;
+				}
+				currentTime[i] = timeNow;
 				double dX = nextPathElement[i].getX()
 						- currentPosition[i].getX();
 				double dY = nextPathElement[i].getY()
@@ -148,11 +148,11 @@ public class PathAnimation2 {
 					nextVector[i]++;
 					if (nextVector[i] >= pointsOnPath.size()) {
 						isFinished(i);
-						return null;
+					} else {
+						nextPathElement[i] = pointsOnPath.get(nextVector[i]);
+						distanceToNextPathElement = Vector3D.getDistance(
+								currentPosition[i], nextPathElement[i]);
 					}
-					nextPathElement[i] = pointsOnPath.get(nextVector[i]);
-					distanceToNextPathElement = Vector3D.getDistance(
-							currentPosition[i], nextPathElement[i]);
 				}
 
 				float percentageToWalk = pathToWalk / distanceToNextPathElement;
@@ -171,8 +171,8 @@ public class PathAnimation2 {
 						(float) Math.toDegrees(pitch),
 						currentPosition[i].getX(), currentPosition[i].getY(),
 						currentPosition[i].getZ() };
-				return lastValues;
 			}
+			return lastValues;
 		}
 		return null;
 	}

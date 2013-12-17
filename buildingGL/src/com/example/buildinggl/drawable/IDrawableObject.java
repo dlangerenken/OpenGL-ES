@@ -1,6 +1,6 @@
 package com.example.buildinggl.drawable;
 
-public interface IDrawableObject {
+public interface IDrawableObject { //TODO to class Abstract with visible..
 	void draw(float[] mvpMatrix);
 
 	boolean isVisible();

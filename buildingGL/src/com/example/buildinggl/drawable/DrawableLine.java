@@ -48,7 +48,8 @@ public class DrawableLine implements IDrawableObject { // TODO line and object
 	 * @param color
 	 */
 	public DrawableLine(List<Point> points, float[] color) {
-		init(points, color);
+		this.points = points;
+		this.color = color;
 	}
 
 	private void init(List<Point> points, float[] color) {

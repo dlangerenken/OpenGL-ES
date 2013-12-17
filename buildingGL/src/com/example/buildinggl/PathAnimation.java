@@ -25,8 +25,8 @@ public class PathAnimation {
 	private int repeatCount = 1;
 	private int currentRepeatCount = 0;
 
-	public PathAnimation(List<Vector3D> pointsOnPath, float timeToFinish,
-			int repeatCount) {
+	public PathAnimation(long timeToFinish, int repeatCount,
+			List<Vector3D> pointsOnPath) {
 		this.pointsOnPath = pointsOnPath;
 		this.timeToFinish = timeToFinish;
 		this.repeatCount = repeatCount;
@@ -37,7 +37,7 @@ public class PathAnimation {
 		calculatePathLength();
 	}
 
-	public PathAnimation(List<Point> points, int timeToFinish, int repeatCount) {
+	public PathAnimation(List<Point> points, long timeToFinish, int repeatCount) {
 		List<Vector3D> vectors = new ArrayList<Vector3D>();
 		for (Point point : points) {
 			vectors.add(new Vector3D(point.x, point.y, point.z));
@@ -79,6 +79,7 @@ public class PathAnimation {
 	}
 
 	private float[] lastValues = new float[1];
+
 	/**
 	 * 
 	 * @return float[](yaw,pitch,x,y,z)
@@ -134,12 +135,12 @@ public class PathAnimation {
 		}
 		return null;
 	}
-	
-//	public float animateOffset(int current){
-//		int id = current % numberOfElements;
-//		float timeSpawn =  timeToFinish / numberOfElements;
-//		float delayForId = id*timeSpawn;
-//	}
+
+	// public float animateOffset(int current){
+	// int id = current % numberOfElements;
+	// float timeSpawn = timeToFinish / numberOfElements;
+	// float delayForId = id*timeSpawn;
+	// }
 
 	private void isFinished() {
 		currentRepeatCount++;
