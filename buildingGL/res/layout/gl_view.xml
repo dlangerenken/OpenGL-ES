@@ -23,4 +23,19 @@
         android:layout_gravity="left|bottom"
         android:layout_marginLeft="30dp" />
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/listOfFloors"
+            android:layout_width="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top" >
+        </LinearLayout>
+    </RelativeLayout>
+
 </FrameLayout>

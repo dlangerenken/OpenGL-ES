@@ -15,11 +15,11 @@
  */
 package com.example.buildinggl;
 
-import melb.mSafe.model.Model3D;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
+import com.example.buildinggl.drawable.Model3DGL;
 import com.example.touch.TouchManager;
 import com.example.touch.Vector2D;
 
@@ -43,14 +43,17 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	private float width;
 	private float height;
 	private final MyGLRenderer mRenderer;
+	private Model3DGL model3dGl;
 
-	public MyGLSurfaceView(Context context, Model3D model3d) {
+	public MyGLSurfaceView(Context context, Model3DGL model3dGl) {
 		super(context);
+		this.model3dGl = model3dGl;
+		
 		// Create an OpenGL ES 2.0 context.
 		setEGLContextClientVersion(2);
 		// setPreserveEGLContextOnPause(true);
 		// Set the Renderer for drawing on the GLSurfaceView
-		mRenderer = new MyGLRenderer(model3d);
+		mRenderer = new MyGLRenderer(model3dGl);
 		setRenderer(mRenderer);
 
 		// Render the view only when there is a change in the drawing data
@@ -59,8 +62,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		this.width = mRenderer.model3d.width;
-		this.height = mRenderer.model3d.height;
+		this.width = model3dGl.getWidth();
+		this.height = model3dGl.getHeight();
 		try {
 			touchManager.update(event);
 
@@ -104,4 +107,5 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	public MyGLRenderer getRenderer() {
 		return mRenderer;
 	}
+
 }

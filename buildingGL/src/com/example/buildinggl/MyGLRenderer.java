@@ -15,26 +15,15 @@
  */
 package com.example.buildinggl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.example.buildinggl.drawable.DrawableLine;
-import com.example.buildinggl.drawable.DrawableObject;
-import com.example.buildinggl.drawable.IDrawableObject;
-
-import melb.mSafe.model.Element3D;
-import melb.mSafe.model.Layer3D;
-import melb.mSafe.model.Model3D;
-import melb.mSafe.model.Polygon3D;
-import melb.mSafe.model.Triangle;
-import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
+
+import com.example.buildinggl.drawable.Model3DGL;
 
 /**
  * Provides drawing instructions for a GLSurfaceView object. This class must
@@ -83,7 +72,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private float nearPlaneDistance = 1f;
 	private float farPlaneDistance = 200f;
 
-	private float modelRatio = 1.0f;
+	// private float modelRatio = 1.0f;
 
 	private int offset = 0;
 	private float eyeX = 0;
@@ -113,29 +102,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private float scaleFactor = 20.0f; // no matter what scale factor -> it's
 										// not possible to zoom into the
 										// building...
-
 	private float ratio;
 	private float width;
 	private float height;
 
-	private List<IDrawableObject> drawableObjects;
-	public Model3D model3d;
-	public float heightOfBuilding = 247;
+	public Model3DGL model3d;
 	private float[] backgroundColor = { 210f / 255f, 228f / 255f, 255f / 255f,
 			1.0f };
 
-	private int floorColor = Color.rgb(34, 47, 60);
-	private int wallColor = Color.argb(150, 255, 255, 255);
-
-	public MyGLRenderer(Model3D model3d) {
+	public MyGLRenderer(Model3DGL model3d) {
 		this.model3d = model3d;
-		getModelScale();
-	}
-
-	private void getModelScale() {
-		float highestValue = (model3d.width > model3d.height) ? model3d.width
-				: model3d.height;
-		modelRatio = 2f / highestValue;
 	}
 
 	@Override
@@ -145,42 +121,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 				backgroundColor[2], backgroundColor[3]);
 		GLES20.glDisable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-
-		drawableObjects = new ArrayList<IDrawableObject>();
-		for (Layer3D layer : model3d.layers) {
-			for (Polygon3D polygon : layer.polygons) {
-				List<Triangle> outlineTriangles = new ArrayList<Triangle>();
-				List<Triangle> inlineTriangles = new ArrayList<Triangle>();
-				for (Element3D el : polygon.outlines) {
-					outlineTriangles.addAll(el.triangles);
-				}
-				for (Element3D el : polygon.inlines) {
-					inlineTriangles.addAll(el.triangles);
-				}
-				DrawableObject outlines = new DrawableObject(outlineTriangles,
-						wallColor);
-				DrawableObject inlines = new DrawableObject(inlineTriangles,
-						floorColor);
-				drawableObjects.add(outlines); // wall
-				drawableObjects.add(inlines); // floor
-			}
-		}
-		drawableObjects.add(getLinesOfBuilding());
-	}
-
-	private IDrawableObject getLinesOfBuilding() {
-		List<Point> points = new ArrayList<Point>();
-		Point a = new Point(0, 0, 0);
-		Point b = new Point(model3d.height, 0, 0);
-		Point c = new Point(model3d.height, model3d.width, 0);
-		Point d = new Point(0, model3d.width, 0);
-		points.add(a);
-		points.add(b);
-		points.add(c);
-		points.add(d);
-		points.add(a);
-		DrawableLine modelLine = new DrawableLine(points, Color.RED);
-		return modelLine;
+		 model3d.initWithGLContext();
 	}
 
 	@Override
@@ -201,14 +142,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		// model is in origin-solution too big
-		Matrix.scaleM(mModelMatrix, 0, modelRatio * scaleFactor, modelRatio
-				* scaleFactor, modelRatio * scaleFactor);
+		Matrix.scaleM(mModelMatrix, 0, model3d.getRatio() * scaleFactor,
+				model3d.getRatio() * scaleFactor, model3d.getRatio()
+						* scaleFactor);
 		// Matrix.translateM(mModelMatrix, 0, -1f, -1f, -1f);
 
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
 
 		// TODO rename height to length
-		rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true);
+		model3d.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true);
 
 		// Set the camera position (View matrix)
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
@@ -225,33 +167,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
-		for (IDrawableObject d : drawableObjects) {
-			d.draw(mMVPMatrix);
-		}
-	}
+		 model3d.draw(mMVPMatrix);
 
-	private void rotateModel(float[] mModelMatrix, Float x, Float y, Float z,
-			boolean rotateAroundCenter) {
-		// translation for rotating the model around its center
-		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, (model3d.width / 2f),
-					heightOfBuilding / 2, (model3d.height / 2f));
-		}
-		if (x != null) {
-			Matrix.rotateM(mModelMatrix, 0, x, 1.0f, 0.0f, 0.0f);
-		}
-		if (y != null) {
-			Matrix.rotateM(mModelMatrix, 0, y, 0.0f, 1.0f, 0.0f);
-		}
-		if (z != null) {
-			Matrix.rotateM(mModelMatrix, 0, z, 0.0f, 0.0f, 1.0f);
-		}
-
-		// translation back to the origin
-		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, -(model3d.width / 2f),
-					-heightOfBuilding / 2, -(model3d.height / 2f));
-		}
 	}
 
 	@Override

@@ -13,11 +13,16 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import com.example.buildinggl.drawable.Layer3DGL;
+import com.example.buildinggl.drawable.Model3DGL;
 import com.google.gson.Gson;
 
 public class OpenGLViewFragment extends Fragment {
@@ -26,9 +31,10 @@ public class OpenGLViewFragment extends Fragment {
 	private MyGLSurfaceView mGLView;
 	private MyGLRenderer mGLRenderer;
 
-	private Model3D model3d;
+	private Model3DGL model3d;
 	private CustomSeekBar seekBarZ;
 	private CustomSeekBar seekBarX;
+	private LinearLayout listOfFloors;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,13 +45,34 @@ public class OpenGLViewFragment extends Fragment {
 			mGLView = new MyGLSurfaceView(getActivity(), model3d);
 			rootView.addView(mGLView, 0);
 		}
+		listOfFloors = (LinearLayout) rootView.findViewById(R.id.listOfFloors);
+		initListView();
 		initSeekBars(rootView);
 		return rootView;
 	}
 
+	private void initListView() {
+		int i = 0;
+		for (final Layer3DGL layer : model3d.getLayers()) { // TODO each layer
+															// own
+			// buffer, own
+			// visibility
+			Button button = new Button(getActivity());
+			button.setText(i++ + "");
+			button.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					layer.setVisible(!layer.isVisible());
+				}
+			});
+			listOfFloors.addView(button);
+		}
+	}
+
 	private void initSeekBars(FrameLayout rootView) {
 		seekBarZ = (CustomSeekBar) rootView.findViewById(R.id.seekBarZ);
-		seekBarZ.setVisibility(View.GONE); //TODO
+		seekBarZ.setVisibility(View.GONE); // TODO
 		seekBarX = (CustomSeekBar) rootView.findViewById(R.id.seekBarX);
 		if (mGLView != null) {
 			mGLRenderer = mGLView.getRenderer();
@@ -104,14 +131,16 @@ public class OpenGLViewFragment extends Fragment {
 			// * simple layer for testing
 			// */
 
-			model3d = new Gson().fromJson(
+			Model3D model = new Gson().fromJson(
 					getStringFromRaw(getActivity(), R.raw.building_model),
 					Model3D.class);
+			model.height = 1948; // TODO in xml
+			model.width = 1169; // TODO in xml
+
+			model3d = new Model3DGL(model);
 			// Layer3D layer = model3d.layers.get(0);
 			// model3d.layers = new ArrayList<Layer3D>();
 			// model3d.layers.add(layer);
-			model3d.height = 1948; // TODO in xml
-			model3d.width = 1169; // TODO in xml
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

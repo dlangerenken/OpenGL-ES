@@ -11,7 +11,9 @@ import android.opengl.GLES20;
 import com.example.buildinggl.MyGLRenderer;
 import com.example.buildinggl.Point;
 
-public class DrawableLine implements IDrawableObject {
+public class DrawableLine implements IDrawableObject { // TODO line and object
+														// to same class
+	private boolean visible = true;
 
 	private final String vertexShaderCode =
 	// This matrix member variable provides a hook to manipulate
@@ -90,9 +92,17 @@ public class DrawableLine implements IDrawableObject {
 
 	}
 
+	private List<Point> points;
+
 	public DrawableLine(List<Point> points, int color) {
-		init(points, new float[] { Color.red(color) / 255f,
-				Color.green(color) / 255f, Color.blue(color) / 255f, 1.0f });
+		this.points = points;
+		this.color = new float[] { Color.red(color) / 255f,
+				Color.green(color) / 255f, Color.blue(color) / 255f, 1.0f };
+	}
+
+	@Override
+	public void initWithGLContext() {
+		init(points, color);
 	}
 
 	/**
@@ -117,11 +127,10 @@ public class DrawableLine implements IDrawableObject {
 
 		// get handle to fragment shader's vColor member
 		mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
-		
+
 		GLES20.glLineWidth(5.0f);
 		// Prepare the triangle coordinate data
 		GLES20.glUniform4fv(mColorHandle, 1, color, 0);
-		
 
 		// get handle to shape's transformation matrix
 		mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
@@ -138,4 +147,13 @@ public class DrawableLine implements IDrawableObject {
 		GLES20.glDisableVertexAttribArray(mPositionHandle);
 	}
 
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
 }
