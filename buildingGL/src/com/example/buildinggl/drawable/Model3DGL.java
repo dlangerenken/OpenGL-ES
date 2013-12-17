@@ -90,32 +90,6 @@ public class Model3DGL implements IDrawableObject {
 		modelRatio = 2f / highestValue;
 	}
 
-	public void rotateModel(float[] mModelMatrix, Float x, Float y, Float z,
-			boolean rotateAroundCenter) { // TODO more general with additional
-											// parameters like midOfX, midOfY,
-											// midOfZ
-		// translation for rotating the model around its center
-		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, (getLength() / 2f),
-					(getWidth() / 2f), (getHeight() / 2f));
-		}
-		if (x != null) {
-			Matrix.rotateM(mModelMatrix, 0, x, 1.0f, 0.0f, 0.0f);
-		}
-		if (y != null) {
-			Matrix.rotateM(mModelMatrix, 0, y, 0.0f, 1.0f, 0.0f);
-		}
-		if (z != null) {
-			Matrix.rotateM(mModelMatrix, 0, z, 0.0f, 0.0f, 1.0f);
-		}
-
-		// translation back to the origin
-		if (rotateAroundCenter) {
-			Matrix.translateM(mModelMatrix, 0, -(getLength()) / 2,
-					-(getWidth() / 2f), -(getHeight() / 2f));
-		}
-	}
-
 	public List<Layer3DGL> getLayers() {
 		return glLayers;
 	}

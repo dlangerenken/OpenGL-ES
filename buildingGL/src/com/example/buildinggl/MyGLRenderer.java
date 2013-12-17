@@ -119,7 +119,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 				backgroundColor[2], backgroundColor[3]);
 		GLES20.glDisable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-		 model3d.initWithGLContext();
+		model3d.initWithGLContext();
 	}
 
 	@Override
@@ -147,7 +147,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
 
-		model3d.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true);
+		GLHelper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
+				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
 
 		// Set the camera position (View matrix)
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
@@ -164,7 +165,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
-		 model3d.draw(mMVPMatrix);
+		model3d.draw(mMVPMatrix);
 
 	}
 
@@ -203,6 +204,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		return shader;
 	}
+
+	
 
 	public int getFPS() {
 		return lastMFPS;
