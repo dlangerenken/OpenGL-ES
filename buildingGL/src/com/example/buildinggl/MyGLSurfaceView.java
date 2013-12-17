@@ -48,7 +48,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	public MyGLSurfaceView(Context context, Model3DGL model3dGl) {
 		super(context);
 		this.model3dGl = model3dGl;
-		
+
 		// Create an OpenGL ES 2.0 context.
 		setEGLContextClientVersion(2);
 		// setPreserveEGLContextOnPause(true);
@@ -63,7 +63,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		this.width = model3dGl.getWidth();
-		this.height = model3dGl.getLength(); //model length = onTouch Height
+		this.height = model3dGl.getLength(); // model length = onTouch Height
 		try {
 			touchManager.update(event);
 

@@ -147,8 +147,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
 
-		GLHelper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
-				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
+		GLHelper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ,
+				true, model3d.getWidth(), model3d.getLength(),
+				model3d.getHeight());
 
 		// Set the camera position (View matrix)
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
@@ -204,8 +205,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		return shader;
 	}
-
-	
 
 	public int getFPS() {
 		return lastMFPS;

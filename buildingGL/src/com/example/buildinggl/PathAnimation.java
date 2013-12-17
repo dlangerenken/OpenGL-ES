@@ -1,5 +1,6 @@
 package com.example.buildinggl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +26,23 @@ public class PathAnimation {
 	private int currentRepeatCount = 0;
 
 	public PathAnimation(List<Vector3D> pointsOnPath, float timeToFinish,
-			Float length, Float height, Float width, int repeatCount) {
+			int repeatCount) {
 		this.pointsOnPath = pointsOnPath;
+		this.timeToFinish = timeToFinish;
+		this.repeatCount = repeatCount;
+		this.nextVector = 0;
+		this.currentPosition = pointsOnPath.get(nextVector++);
+		this.nextPathElement = pointsOnPath.get(nextVector);
+		this.currentTime = new Date().getTime();
+		calculatePathLength();
+	}
+
+	public PathAnimation(List<Point> points, int timeToFinish, int repeatCount) {
+		List<Vector3D> vectors = new ArrayList<Vector3D>();
+		for (Point point : points) {
+			vectors.add(new Vector3D(point.x, point.y, point.z));
+		}
+		this.pointsOnPath = vectors;
 		this.timeToFinish = timeToFinish;
 		this.repeatCount = repeatCount;
 		this.nextVector = 0;
@@ -62,6 +78,11 @@ public class PathAnimation {
 		this.pathLength = distance;
 	}
 
+	private float[] lastValues = new float[1];
+	/**
+	 * 
+	 * @return float[](yaw,pitch,x,y,z)
+	 */
 	public float[] animate() {
 		if (isRunnning) {
 			long timeNow = new Date().getTime();
@@ -73,9 +94,9 @@ public class PathAnimation {
 				double dY = nextPathElement.getY() - currentPosition.getY();
 				double dZ = nextPathElement.getZ() - currentPosition.getZ();
 
-				float yaw = (float) Math.atan2(dZ, dX);
-				float pitch = (float) (Math.atan2(Math.sqrt(dZ * dZ + dX * dX),
-						dY) + Math.PI);
+				float yaw = (float) Math.atan2(dY, dX);
+				float pitch = (float) (Math.atan2(Math.sqrt(dX * dX + dY * dY),
+						dZ) + Math.PI);
 
 				float pathToWalk = pathLength / timeToFinish * delta;
 				float distanceToNextPathElement = Vector3D.getDistance(
@@ -84,7 +105,7 @@ public class PathAnimation {
 					currentPosition = nextPathElement;
 					pathToWalk -= distanceToNextPathElement;
 					nextVector++;
-					if (nextVector > pointsOnPath.size()) {
+					if (nextVector >= pointsOnPath.size()) {
 						isFinished();
 						return null;
 					}
@@ -101,15 +122,24 @@ public class PathAnimation {
 				float newZ = (nextPathElement.getZ() - currentPosition.getZ())
 						* percentageToWalk;
 				Vector3D difference = new Vector3D(newX, newY, newZ);
+				currentPosition = new Vector3D(currentPosition);
 				currentPosition.add(difference);
 				pathToWalk = 0;
 
-				return new float[] { yaw, pitch, currentPosition.getX(),
+				lastValues = new float[] { (float) Math.toDegrees(yaw),
+						(float) Math.toDegrees(pitch), currentPosition.getX(),
 						currentPosition.getY(), currentPosition.getZ() };
+				return lastValues;
 			}
 		}
 		return null;
 	}
+	
+//	public float animateOffset(int current){
+//		int id = current % numberOfElements;
+//		float timeSpawn =  timeToFinish / numberOfElements;
+//		float delayForId = id*timeSpawn;
+//	}
 
 	private void isFinished() {
 		currentRepeatCount++;
