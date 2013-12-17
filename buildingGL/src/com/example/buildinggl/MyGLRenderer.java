@@ -72,8 +72,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private float nearPlaneDistance = 1f;
 	private float farPlaneDistance = 200f;
 
-	// private float modelRatio = 1.0f;
-
 	private int offset = 0;
 	private float eyeX = 0;
 	private float eyeY = 0;
@@ -149,7 +147,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
 
-		// TODO rename height to length
 		model3d.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true);
 
 		// Set the camera position (View matrix)

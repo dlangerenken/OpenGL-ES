@@ -63,7 +63,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		this.width = model3dGl.getWidth();
-		this.height = model3dGl.getHeight();
+		this.height = model3dGl.getLength(); //model length = onTouch Height
 		try {
 			touchManager.update(event);
 

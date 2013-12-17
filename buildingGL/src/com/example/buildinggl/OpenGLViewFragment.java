@@ -53,10 +53,7 @@ public class OpenGLViewFragment extends Fragment {
 
 	private void initListView() {
 		int i = 0;
-		for (final Layer3DGL layer : model3d.getLayers()) { // TODO each layer
-															// own
-			// buffer, own
-			// visibility
+		for (final Layer3DGL layer : model3d.getLayers()) {
 			Button button = new Button(getActivity());
 			button.setText(i++ + "");
 			button.setOnClickListener(new OnClickListener() {
@@ -134,9 +131,9 @@ public class OpenGLViewFragment extends Fragment {
 			Model3D model = new Gson().fromJson(
 					getStringFromRaw(getActivity(), R.raw.building_model),
 					Model3D.class);
-			model.height = 1948; // TODO in xml
-			model.width = 1169; // TODO in xml
-
+//			model.length = 1948; // TODO in xml
+//			model.width = 1169; // TODO in xml
+//			model.height = 247;
 			model3d = new Model3DGL(model);
 			// Layer3D layer = model3d.layers.get(0);
 			// model3d.layers = new ArrayList<Layer3D>();
