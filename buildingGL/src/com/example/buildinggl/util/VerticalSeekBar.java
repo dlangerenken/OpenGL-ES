@@ -1,6 +1,4 @@
-package com.example.buildinggl;
-
-import com.example.gui.CustomSeekBar;
+package com.example.buildinggl.util;
 
 import android.content.Context;
 import android.graphics.Canvas;

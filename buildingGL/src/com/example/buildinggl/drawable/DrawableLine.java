@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 
 import com.example.buildinggl.MyGLRenderer;
-import com.example.touch.Vector3D;
+import com.example.buildinggl.util.Vector3D;
 
 public class DrawableLine implements IDrawableObject { // TODO line and object
 														// to same class

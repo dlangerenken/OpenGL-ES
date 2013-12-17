@@ -1,4 +1,4 @@
-package com.example.buildinggl;
+package com.example.buildinggl.util;
 
 import android.opengl.Matrix;
 

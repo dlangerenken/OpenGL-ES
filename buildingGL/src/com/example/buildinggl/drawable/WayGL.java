@@ -7,9 +7,9 @@ import melb.mSafe.model.Node;
 import melb.mSafe.model.Triangle;
 import melb.mSafe.model.Way;
 
-import com.example.buildinggl.GLHelper;
-import com.example.buildinggl.PathAnimation;
-import com.example.touch.Vector3D;
+import com.example.buildinggl.util.GLHelper;
+import com.example.buildinggl.util.PathAnimation;
+import com.example.buildinggl.util.Vector3D;
 
 public class WayGL implements IDrawableObject {
 

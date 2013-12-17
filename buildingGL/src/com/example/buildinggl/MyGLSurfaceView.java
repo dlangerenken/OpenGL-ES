@@ -20,8 +20,8 @@ import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
 import com.example.buildinggl.drawable.Model3DGL;
-import com.example.touch.TouchManager;
-import com.example.touch.Vector2D;
+import com.example.buildinggl.util.TouchManager;
+import com.example.buildinggl.util.Vector2D;
 
 /**
  * A view container where OpenGL ES graphics can be drawn on screen. This view

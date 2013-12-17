@@ -1,4 +1,4 @@
-package com.example.touch;
+package com.example.buildinggl.util;
 
 public class Vector2D {
 

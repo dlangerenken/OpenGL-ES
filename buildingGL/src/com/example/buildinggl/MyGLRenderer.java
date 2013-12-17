@@ -24,6 +24,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.example.buildinggl.drawable.Model3DGL;
+import com.example.buildinggl.util.GLHelper;
 
 /**
  * Provides drawing instructions for a GLSurfaceView object. This class must

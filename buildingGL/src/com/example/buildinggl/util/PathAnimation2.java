@@ -1,10 +1,7 @@
-package com.example.buildinggl;
+package com.example.buildinggl.util;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.example.touch.Vector3D;
 
 public class PathAnimation2 {
 	public static final int INFINITY = -1;

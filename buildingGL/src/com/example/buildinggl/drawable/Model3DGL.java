@@ -9,7 +9,7 @@ import melb.mSafe.model.Node;
 import melb.mSafe.model.Way;
 import android.graphics.Color;
 
-import com.example.touch.Vector3D;
+import com.example.buildinggl.util.Vector3D;
 
 public class Model3DGL implements IDrawableObject {
 	private List<Layer3DGL> glLayers;
