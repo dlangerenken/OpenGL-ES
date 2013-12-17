@@ -9,7 +9,7 @@ import melb.mSafe.model.Way;
 
 import com.example.buildinggl.GLHelper;
 import com.example.buildinggl.PathAnimation;
-import com.example.buildinggl.Point;
+import com.example.touch.Vector3D;
 
 public class WayGL implements IDrawableObject {
 
@@ -32,16 +32,16 @@ public class WayGL implements IDrawableObject {
 		this.defaultColor = color;
 		this.defaultColor[3] = 0.5f;
 		this.timeToFinish = timeToFinish;
-		
-		List<Point> points = new ArrayList<Point>();
+
+		List<Vector3D> points = new ArrayList<Vector3D>();
 		for (Node node : way.getPoints()) {
-			points.add(new Point(node.getX(), node.getY(), node.getZ()));
+			points.add(new Vector3D(node.getX(), node.getY(), node.getZ()));
 		}
 		glWay = new DrawableLine(points, defaultColor);
-		
+
 		if (shouldAnimate) {
-			animation = new PathAnimation(points, timeToFinish,
-					PathAnimation.INFINITY);
+			animation = new PathAnimation(timeToFinish, PathAnimation.INFINITY,
+					points);
 			animation.start();
 			List<Triangle> triangles = new ArrayList<Triangle>();
 			// first part of arrow

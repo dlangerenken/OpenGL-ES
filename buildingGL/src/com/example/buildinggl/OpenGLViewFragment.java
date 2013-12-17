@@ -23,6 +23,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.example.buildinggl.drawable.Layer3DGL;
 import com.example.buildinggl.drawable.Model3DGL;
+import com.example.gui.CustomSeekBar;
 import com.google.gson.Gson;
 
 public class OpenGLViewFragment extends Fragment {

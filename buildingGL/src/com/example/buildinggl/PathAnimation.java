@@ -37,21 +37,6 @@ public class PathAnimation {
 		calculatePathLength();
 	}
 
-	public PathAnimation(List<Point> points, long timeToFinish, int repeatCount) {
-		List<Vector3D> vectors = new ArrayList<Vector3D>();
-		for (Point point : points) {
-			vectors.add(new Vector3D(point.x, point.y, point.z));
-		}
-		this.pointsOnPath = vectors;
-		this.timeToFinish = timeToFinish;
-		this.repeatCount = repeatCount;
-		this.nextVector = 0;
-		this.currentPosition = pointsOnPath.get(nextVector++);
-		this.nextPathElement = pointsOnPath.get(nextVector);
-		this.currentTime = new Date().getTime();
-		calculatePathLength();
-	}
-
 	public void start() {
 		this.currentTime = new Date().getTime();
 		isRunnning = true;

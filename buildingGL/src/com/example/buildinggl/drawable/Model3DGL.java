@@ -9,7 +9,7 @@ import melb.mSafe.model.Node;
 import melb.mSafe.model.Way;
 import android.graphics.Color;
 
-import com.example.buildinggl.Point;
+import com.example.touch.Vector3D;
 
 public class Model3DGL implements IDrawableObject {
 	private List<Layer3DGL> glLayers;
@@ -18,7 +18,7 @@ public class Model3DGL implements IDrawableObject {
 	private boolean buildingVisible = true;
 	private float modelRatio = 1.0f;
 	private Model3D model;
-	private List<Point> points;
+	private List<Vector3D> points;
 	private IDrawableObject linesOfBuilding;
 	private List<WayGL> glWays;
 
@@ -33,8 +33,9 @@ public class Model3DGL implements IDrawableObject {
 		glWays = new ArrayList<WayGL>();
 		List<Node> nodes = new ArrayList<Node>();
 		int counter = 0;
-		for (Point point : points) {
-			nodes.add(new Node(counter++, point.x, point.y, point.z));
+		for (Vector3D point : points) {
+			nodes.add(new Node(counter++, point.getX(), point.getY(), point
+					.getZ()));
 		}
 		Way way = new Way(nodes);
 
@@ -62,12 +63,12 @@ public class Model3DGL implements IDrawableObject {
 	}
 
 	private IDrawableObject getLinesOfBuilding() {
-		points = new ArrayList<Point>();
-		points.add(new Point(0, 0, 0));
-		points.add(new Point(model.length, 0, 0));
-		points.add(new Point(model.length, model.width, 0));
-		points.add(new Point(0, model.width, 0));
-		points.add(new Point(0, 0, 0));
+		points = new ArrayList<Vector3D>();
+		points.add(new Vector3D(0, 0, 0));
+		points.add(new Vector3D(model.length, 0, 0));
+		points.add(new Vector3D(model.length, model.width, 0));
+		points.add(new Vector3D(0, model.width, 0));
+		points.add(new Vector3D(0, 0, 0));
 		DrawableLine modelLine = new DrawableLine(points, Color.RED);
 		return modelLine;
 	}
@@ -83,7 +84,7 @@ public class Model3DGL implements IDrawableObject {
 			if (linesVisible) {
 				linesOfBuilding.draw(mvpMatrix);
 			}
-			for (WayGL way : glWays) { //TODO maybe only layer
+			for (WayGL way : glWays) { // TODO maybe only layer
 				way.draw(mvpMatrix);
 			}
 		}

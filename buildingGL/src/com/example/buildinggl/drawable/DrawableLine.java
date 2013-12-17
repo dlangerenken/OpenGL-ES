@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 
 import com.example.buildinggl.MyGLRenderer;
-import com.example.buildinggl.Point;
+import com.example.touch.Vector3D;
 
 public class DrawableLine implements IDrawableObject { // TODO line and object
 														// to same class
@@ -47,20 +47,20 @@ public class DrawableLine implements IDrawableObject { // TODO line and object
 	 * 
 	 * @param color
 	 */
-	public DrawableLine(List<Point> points, float[] color) {
+	public DrawableLine(List<Vector3D> points, float[] color) {
 		this.points = points;
 		this.color = color;
 	}
 
-	private void init(List<Point> points, float[] color) {
+	private void init(List<Vector3D> points, float[] color) {
 		float[] vertices = new float[points.size() * 3];
 		this.color = color;
 		int counter = 0;
 		for (int i = 0; i < points.size(); i++) {
-			float[] pointFloat = points.get(i).getXYZ();
-			vertices[counter++] = pointFloat[0];
-			vertices[counter++] = pointFloat[1];
-			vertices[counter++] = pointFloat[2];
+			Vector3D vec = points.get(i);
+			vertices[counter++] = vec.getX();
+			vertices[counter++] = vec.getY();
+			vertices[counter++] = vec.getZ();
 		}
 
 		// initialize vertex byte buffer for shape coordinates
@@ -93,9 +93,9 @@ public class DrawableLine implements IDrawableObject { // TODO line and object
 
 	}
 
-	private List<Point> points;
+	private List<Vector3D> points;
 
-	public DrawableLine(List<Point> points, int color) {
+	public DrawableLine(List<Vector3D> points, int color) {
 		this.points = points;
 		this.color = new float[] { Color.red(color) / 255f,
 				Color.green(color) / 255f, Color.blue(color) / 255f, 1.0f };

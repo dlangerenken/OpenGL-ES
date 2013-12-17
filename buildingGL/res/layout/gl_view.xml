@@ -16,7 +16,7 @@
         android:layout_gravity="left|bottom"
         android:layout_marginBottom="30dp" />
 
-    <com.example.buildinggl.CustomSeekBar
+    <com.example.gui.CustomSeekBar
         android:id="@+id/seekBarZ"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
