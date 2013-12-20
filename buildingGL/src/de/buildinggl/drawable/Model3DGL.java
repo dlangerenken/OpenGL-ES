@@ -19,7 +19,7 @@ public class Model3DGL implements IDrawableObject {
 	private float modelRatio = 1.0f;
 	private Model3D model;
 	private IDrawableObject linesWay;
-//	private List<WayGL> glWays;
+	private List<WayGL> glWays;
 	private Vector3D userPosition;
 	private IDrawableObject glUserPosition;
 
@@ -27,7 +27,7 @@ public class Model3DGL implements IDrawableObject {
 		this.model = model;
 		getModelRatio();
 		initLayers();
-//		initWays();
+//		initWays(); //TODO bugfix needed
 		initUserPosition();
 	}
 
@@ -36,31 +36,39 @@ public class Model3DGL implements IDrawableObject {
 		glUserPosition = new UserPositionGL(true, userPosition);
 	}
 
-//	private void initWays() {
-//		glWays = new ArrayList<WayGL>();
-//		List<Node> nodes = new ArrayList<Node>();
-//		int counter = 0;
-//		for (Vector3D point : points) {
-//			nodes.add(new Node(counter++, point.getX(), point.getY(), point
-//					.getZ()));
-//		}
-//		Way way = new Way(nodes);
-//
-//		glWays.add(new WayGL(way, new float[] { 1.0f, 0.0f, 0.0f, 1.0f }, true,
-//				10000));
-//	}
+	private void initWays() {
+		glWays = new ArrayList<WayGL>();
+		List<Node> nodes = new ArrayList<Node>();
+		int counter = 0;
+		nodes.add(new Node(0, 0, 0, 0));
+		nodes.add(new Node(counter++, model.length, 0, 0));
+		nodes.add(new Node(counter++, model.length, model.width, 0));
+		nodes.add(new Node(counter++, 0, model.width, 0));
+		nodes.add(new Node(counter++, 0, 0, 0));
+
+		Way way = new Way(nodes);
+		glWays.add(new WayGL(way, new float[] { 1.0f, 0.0f, 0.0f, 1.0f }, true,
+				10000));
+	}
 
 	@Override
 	public void initWithGLContext(ShaderProgram colorProgram) {
-		for (Layer3DGL glLayer : glLayers) {
-			glLayer.initWithGLContext(colorProgram);
+		if (glLayers != null) {
+			for (Layer3DGL glLayer : glLayers) {
+				glLayer.initWithGLContext(colorProgram);
+			}
 		}
-		linesWay.initWithGLContext(colorProgram);
-
-//		for (WayGL way : glWays) {
-//			way.initWithGLContext(colorProgram);
-//		}
-		glUserPosition.initWithGLContext(colorProgram);
+		if (linesWay != null) {
+			linesWay.initWithGLContext(colorProgram);
+		}
+		if (glWays != null) {
+			for (WayGL way : glWays) {
+				way.initWithGLContext(colorProgram);
+			}
+		}
+		if (glUserPosition != null) {
+			glUserPosition.initWithGLContext(colorProgram);
+		}
 	}
 
 	private void initLayers() {
@@ -88,17 +96,25 @@ public class Model3DGL implements IDrawableObject {
 	public void draw(float[] mvpMatrix) {
 		if (visible) {
 			if (buildingVisible) {
-				for (Layer3DGL layer : glLayers) {
-					layer.draw(mvpMatrix);
+				if (glLayers != null) {
+					for (Layer3DGL layer : glLayers) {
+						layer.draw(mvpMatrix);
+					}
 				}
 			}
 			if (linesVisible) {
-				linesWay.draw(mvpMatrix);
+				if (linesWay != null) {
+					linesWay.draw(mvpMatrix);
+				}
 			}
-//			for (WayGL way : glWays) { // TODO maybe only layer
-//				way.draw(mvpMatrix);
-//			}
-			glUserPosition.draw(mvpMatrix);
+			if (glWays != null) {
+				for (WayGL way : glWays) {
+					way.draw(mvpMatrix);
+				}
+			}
+			if (glUserPosition != null) {
+				glUserPosition.draw(mvpMatrix);
+			}
 		}
 	}
 

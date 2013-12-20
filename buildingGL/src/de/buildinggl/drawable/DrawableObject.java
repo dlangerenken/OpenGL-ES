@@ -24,25 +24,23 @@ public class DrawableObject implements IDrawableObject {
 	public DrawableObject(List<Triangle> triangles) {
 		float[] vertices = FloatBufferHelper.createPolygon(triangles);
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7;
+		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
 	}
 
 	public DrawableObject(float[] vertices) {
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7;
+		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
 	}
 
 	public DrawableObject(float[] vertices, Integer glType, int offset) {
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7;
+		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
 		this.offset = offset;
 		this.glType = glType;
 	}
 
 	public DrawableObject(List<Vector3D> points, float[] defaultColor) {
-		// TODO iwas mit defaultcolor machen ... anderes shaderprogram nehmen!!
-		// wenn nciht jedes dreieck andere farbe haben soll :O siehe tutorial
-		// mit farben
+		// TODO Auto-generated constructor stub //TODO for ways
 	}
 
 	/**
