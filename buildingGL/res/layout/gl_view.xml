@@ -9,32 +9,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <com.example.buildinggl.util.VerticalSeekBar
+    <de.buildinggl.views.VerticalSeekBar
         android:id="@+id/seekBarX"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
         android:layout_gravity="left|bottom"
         android:layout_marginBottom="30dp" />
 
-    <com.example.buildinggl.util.CustomSeekBar
-        android:id="@+id/seekBarZ"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left|bottom"
-        android:layout_marginLeft="30dp" />
-
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="fill_parent" >
 
         <LinearLayout
-            android:orientation="vertical"
             android:id="@+id/listOfFloors"
             android:layout_width="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|top" >
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right|top"
+            android:orientation="vertical" >
         </LinearLayout>
     </RelativeLayout>
 
