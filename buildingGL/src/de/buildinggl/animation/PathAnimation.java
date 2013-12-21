@@ -120,12 +120,6 @@ public class PathAnimation {
 		return null;
 	}
 
-	// public float animateOffset(int current){
-	// int id = current % numberOfElements;
-	// float timeSpawn = timeToFinish / numberOfElements;
-	// float delayForId = id*timeSpawn;
-	// }
-
 	private void isFinished() {
 		currentRepeatCount++;
 		if (repeatCount == INFINITY || currentRepeatCount < repeatCount) {

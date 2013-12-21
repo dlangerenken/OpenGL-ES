@@ -83,10 +83,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	private float mZoomLevel = 1f;
 
-	private float defaultRotationX = 100.0f; // building otherwise on the wrong
-												// side
-	private float defaultRotationZ = 180.0f; // building otherwise on the wrong
-												// side
+	/*
+	 * building otherwise on the wrong side
+	 */
+	private float defaultRotationX = 100.0f;
+	private float defaultRotationZ = 180.0f;
+	
 	private float rotationX = defaultRotationX;
 	private float rotationY = 0.0f;
 	private float rotationZ = defaultRotationZ;
@@ -123,17 +125,17 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onDrawFrame(GL10 unused) {
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 		LoggerHelper.calculateFPS();
-
+		
 		/*
 		 * Draw background color
 		 */
-		Matrix.setIdentityM(mModelMatrix, 0);
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
 		/*
-		 * model is in origin-solution too big
+		 * scale model down to smaller values
 		 */
+		Matrix.setIdentityM(mModelMatrix, 0);
 		Matrix.scaleM(mModelMatrix, 0, model3d.getRatio() * scaleFactor,
 				model3d.getRatio() * scaleFactor, model3d.getRatio()
 						* scaleFactor);
@@ -178,8 +180,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceChanged(GL10 unused, int width, int height) {
-		// Adjust the viewport based on geometry changes,
-		// such as screen rotation
+		/*
+		 *  Adjust the viewport based on geometry changes,
+		 *  such as screen rotation
+		 */
 		GLES20.glViewport(0, 0, width, height);
 		this.width = width;
 		this.height = height;
