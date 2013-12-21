@@ -24,6 +24,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import de.buildinggl.drawable.Model3DGL;
 import de.buildinggl.utilities.Helper;
+import de.buildinggl.utilities.LoggerHelper;
 
 /**
  * Provides drawing instructions for a GLSurfaceView object. This class must
@@ -38,9 +39,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	public static final String TAG = "MyGLRenderer";
 
-	private int mFPS;
-	private int lastMFPS;
-	private long mLastTime;
 
 	/**
 	 * Store the model matrix. This matrix is used to move models from object
@@ -125,46 +123,56 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onDrawFrame(GL10 unused) {
-		// System.out.println("FPS: " + getFPS());
-		long currentTime = System.currentTimeMillis();
-		mFPS++;
-		if (currentTime - mLastTime >= 1000) {
-			lastMFPS = mFPS;
-			mFPS = 0;
-			mLastTime = currentTime;
-		}
-
-		float[] mMVPMatrix = new float[16];
-
-		// Draw background color
-		Matrix.setIdentityM(mModelMatrix, 0);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+		LoggerHelper.calculateFPS();
 
-		// model is in origin-solution too big
+		/*
+		 * Draw background color
+		 */
+		Matrix.setIdentityM(mModelMatrix, 0);
+
+		/*
+		 * model is in origin-solution too big
+		 */
 		Matrix.scaleM(mModelMatrix, 0, model3d.getRatio() * scaleFactor,
 				model3d.getRatio() * scaleFactor, model3d.getRatio()
 						* scaleFactor);
 
+		/*
+		 * rotate and translate model in dependence to the user input
+		 */
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
-
 		Helper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
 				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
 
-		// Set the camera position (View matrix)
+		/*
+		 * Set the camera position (View matrix)
+		 */
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
 				centerX, centerY, centerZ, upX, upY, upZ);
 
-		// combine the model with the view matrix
+		/*
+		 * combine the model with the view matrix
+		 */
 		Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
 
-		// this projection matrix is applied to object coordinates
-		// in the onDrawFrame() method
+		/*
+		 * this projection matrix is applied to object coordinates in the
+		 * onDrawFrame() method
+		 */
 		Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, 1, -1,
 				nearPlaneDistance, farPlaneDistance);
 
-		// Calculate the projection and view transformation
+		/*
+		 * Calculate the projection and view transformation
+		 */
+		float[] mMVPMatrix = new float[16];
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
+		/*
+		 * all the drawing stuff inside the model-object (otherwise
+		 * translation/rotation wouldn't affect every object)
+		 */
 		model3d.draw(mMVPMatrix);
 	}
 
@@ -178,9 +186,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		ratio = (float) width / height;
 	}
 
-	public int getFPS() {
-		return lastMFPS;
-	}
 
 	public void setZoom(float zoom) {
 		this.mZoomLevel = zoom;

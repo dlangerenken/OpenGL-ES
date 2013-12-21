@@ -12,13 +12,10 @@ import de.buildinggl.utilities.Helper;
 import de.buildinggl.utilities.ShaderProgram;
 
 public class WayGL implements IDrawableObject {
-
-	private Way way;
 	private boolean shouldAnimate;
 	private IDrawableObject glWay;
 	private IDrawableObject animatedWay;
 	private PathAnimation animation;
-	private long timeToFinish;
 
 	private float[] defaultColor;
 	private float[] arrowColor;
@@ -26,12 +23,10 @@ public class WayGL implements IDrawableObject {
 
 	public WayGL(Way way, float[] color, boolean shouldAnimate,
 			long timeToFinish) {
-		this.way = way;
 		this.shouldAnimate = shouldAnimate;
 		this.arrowColor = color;
 		this.defaultColor = color;
 		this.defaultColor[3] = 0.5f;
-		this.timeToFinish = timeToFinish;
 
 		List<Vector3D> points = new ArrayList<Vector3D>();
 		for (Node node : way.getPoints()) {
