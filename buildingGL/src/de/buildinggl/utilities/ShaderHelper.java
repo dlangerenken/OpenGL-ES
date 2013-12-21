@@ -163,6 +163,7 @@ public class ShaderHelper {
         return validateStatus[0] != 0;
     }
 
+	
     /**
      * Helper function that compiles the shaders, links and validates the
      * program, returning the program ID.

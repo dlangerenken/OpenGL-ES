@@ -5,7 +5,7 @@ import java.util.List;
 import melb.mSafe.model.Triangle;
 import melb.mSafe.model.Vector3D;
 import android.opengl.GLES20;
-import de.buildinggl.utilities.PositionShaderProgram;
+import de.buildinggl.utilities.AttributeColorShaderProgram;
 import de.buildinggl.utilities.Constants;
 import de.buildinggl.utilities.FloatBufferHelper;
 import de.buildinggl.utilities.ShaderProgram;
@@ -18,23 +18,25 @@ public class DrawableObject implements IDrawableObject {
 	private VertexArray vertexArray;
 	private Integer glType = null;
 	private int offset = 0;
-	private ShaderProgram program;
 	private int vertexCount;
 
 	public DrawableObject(List<Triangle> triangles) {
 		float[] vertices = FloatBufferHelper.createPolygon(triangles);
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
+		vertexCount = vertices.length / 7; // TODO abhängig vom shader machen ->
+											// polygonsize!! ob rgba oder nicht
 	}
 
 	public DrawableObject(float[] vertices) {
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
+		vertexCount = vertices.length / 7; // TODO abhängig vom shader machen ->
+											// polygonsize!! ob rgba oder nicht
 	}
 
 	public DrawableObject(float[] vertices, Integer glType, int offset) {
 		vertexArray = new VertexArray(vertices);
-		vertexCount = vertices.length / 7; //TODO abhängig vom shader machen -> polygonsize!! ob rgba oder nicht
+		vertexCount = vertices.length / 7; // TODO abhängig vom shader machen ->
+											// polygonsize!! ob rgba oder nicht
 		this.offset = offset;
 		this.glType = glType;
 	}
@@ -49,14 +51,15 @@ public class DrawableObject implements IDrawableObject {
 	 * @param mvpMatrix
 	 *            - The Model View Project matrix in which to draw this shape.
 	 */
-	public void draw(float[] mvpMatrix) {
+	public void draw(float[] mvpMatrix, ShaderProgram program) {
 		program.useProgram();
 
-		if (program instanceof PositionShaderProgram) {
-			PositionShaderProgram positionProgram = (PositionShaderProgram) program;
-			positionProgram.setUniforms(mvpMatrix);
+		if (program instanceof AttributeColorShaderProgram) {
+			AttributeColorShaderProgram positionProgram = (AttributeColorShaderProgram) program;
+			positionProgram.setUniformMatrix(mvpMatrix);
 		}
-		bindData();
+
+		bindData(program);
 		if (visible) {
 			// Draw the triangle
 			if (glType != null) {
@@ -67,16 +70,16 @@ public class DrawableObject implements IDrawableObject {
 		}
 	}
 
-	private void bindData() {
-		if (program instanceof PositionShaderProgram) {
-			PositionShaderProgram positionProgram = (PositionShaderProgram) program;
+	private void bindData(ShaderProgram program) {
+		if (program instanceof AttributeColorShaderProgram) {
+			AttributeColorShaderProgram colorProgram = (AttributeColorShaderProgram) program;
 			vertexArray.setVertexAttribPointer(0,
-					positionProgram.getPositionAttributeLocation(),
+					colorProgram.getPositionAttributeLocation(),
 					Constants.POSITION_COMPONENT_COUNT,
 					Constants.POSITION_COLOR_STRIDE);
 			vertexArray.setVertexAttribPointer(
 					Constants.POSITION_COMPONENT_COUNT,
-					positionProgram.getColorAttributeLocation(),
+					colorProgram.getColorAttributeLocation(),
 					Constants.COLOR_COMPONENT_COUNT,
 					Constants.POSITION_COLOR_STRIDE);
 		} else if (program instanceof TextureShaderProgram) {
@@ -102,10 +105,4 @@ public class DrawableObject implements IDrawableObject {
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
-
-	@Override
-	public void initWithGLContext(ShaderProgram program) {
-		this.program = program;
-	}
-
 }

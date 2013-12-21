@@ -22,9 +22,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.util.Log;
 import de.buildinggl.drawable.Model3DGL;
-import de.buildinggl.utilities.PositionShaderProgram;
 import de.buildinggl.utilities.Helper;
 
 /**
@@ -38,7 +36,7 @@ import de.buildinggl.utilities.Helper;
  */
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
-	private static final String TAG = "MyGLRenderer";
+	public static final String TAG = "MyGLRenderer";
 
 	private int mFPS;
 	private int lastMFPS;
@@ -99,9 +97,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private float translateY = 0.0f;
 	private float translateZ = 0.0f;
 
-	private float scaleFactor = 20.0f; // no matter what scale factor -> it's
-										// not possible to zoom into the
-										// building...
+	private float scaleFactor = 20.0f;
 	private float ratio;
 	private float width;
 	private float height;
@@ -111,14 +107,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 			1.0f };
 
 	private Context context;
-	
+
 	public MyGLRenderer(Model3DGL model3d, Context context) {
 		this.model3d = model3d;
 		this.context = context;
 	}
 
-	private PositionShaderProgram colorProgram;
-	
 	@Override
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 		// Set the background frame color
@@ -126,8 +120,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 				backgroundColor[2], backgroundColor[3]);
 		GLES20.glDisable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-		colorProgram = new PositionShaderProgram(context);
-		model3d.initWithGLContext(colorProgram);
+		model3d.initWithGLContext(context);
 	}
 
 	@Override
@@ -151,13 +144,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		Matrix.scaleM(mModelMatrix, 0, model3d.getRatio() * scaleFactor,
 				model3d.getRatio() * scaleFactor, model3d.getRatio()
 						* scaleFactor);
-		// Matrix.translateM(mModelMatrix, 0, -1f, -1f, -1f);
 
 		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
 
-		Helper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ,
-				true, model3d.getWidth(), model3d.getLength(),
-				model3d.getHeight());
+		Helper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
+				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
 
 		// Set the camera position (View matrix)
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
@@ -175,7 +166,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
 		model3d.draw(mMVPMatrix);
-
 	}
 
 	@Override
@@ -188,56 +178,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		ratio = (float) width / height;
 	}
 
-	/**
-	 * Utility method for compiling a OpenGL shader.
-	 * 
-	 * <p>
-	 * <strong>Note:</strong> When developing shaders, use the checkGlError()
-	 * method to debug shader coding errors.
-	 * </p>
-	 * 
-	 * @param type
-	 *            - Vertex or fragment shader type.
-	 * @param shaderCode
-	 *            - String containing the shader code.
-	 * @return - Returns an id for the shader.
-	 */
-	public static int loadShader(int type, String shaderCode) {
-		// create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-		// or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-		int shader = GLES20.glCreateShader(type);
-
-		// add the source code to the shader and compile it
-		GLES20.glShaderSource(shader, shaderCode);
-		GLES20.glCompileShader(shader);
-
-		return shader;
-	}
-
 	public int getFPS() {
 		return lastMFPS;
-	}
-
-	/**
-	 * Utility method for debugging OpenGL calls. Provide the name of the call
-	 * just after making it:
-	 * 
-	 * <pre>
-	 * mColorHandle = GLES20.glGetUniformLocation(mProgram, &quot;vColor&quot;);
-	 * MyGLRenderer.checkGlError(&quot;glGetUniformLocation&quot;);
-	 * </pre>
-	 * 
-	 * If the operation is not successful, the check throws an error.
-	 * 
-	 * @param glOperation
-	 *            - Name of the OpenGL call to check.
-	 */
-	public static void checkGlError(String glOperation) {
-		int error;
-		while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-			Log.e(TAG, glOperation + ": glError " + error);
-			throw new RuntimeException(glOperation + ": glError " + error);
-		}
 	}
 
 	public void setZoom(float zoom) {

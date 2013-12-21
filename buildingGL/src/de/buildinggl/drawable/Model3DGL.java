@@ -8,26 +8,26 @@ import melb.mSafe.model.Model3D;
 import melb.mSafe.model.Node;
 import melb.mSafe.model.Vector3D;
 import melb.mSafe.model.Way;
+import android.content.Context;
 import android.opengl.GLES20;
-import de.buildinggl.utilities.ShaderProgram;
+import de.buildinggl.utilities.AttributeColorShaderProgram;
 
-public class Model3DGL implements IDrawableObject {
+public class Model3DGL {
 	private List<Layer3DGL> glLayers;
-	private boolean visible = true;
 	private boolean linesVisible = true;
-	private boolean buildingVisible = true;
 	private float modelRatio = 1.0f;
 	private Model3D model;
 	private IDrawableObject linesWay;
 	private List<WayGL> glWays;
 	private Vector3D userPosition;
 	private IDrawableObject glUserPosition;
+	private AttributeColorShaderProgram colorProgram;
 
 	public Model3DGL(Model3D model) {
 		this.model = model;
 		getModelRatio();
 		initLayers();
-//		initWays(); //TODO bugfix needed
+		// initWays(); //TODO bugfix needed
 		initUserPosition();
 	}
 
@@ -51,26 +51,6 @@ public class Model3DGL implements IDrawableObject {
 				10000));
 	}
 
-	@Override
-	public void initWithGLContext(ShaderProgram colorProgram) {
-		if (glLayers != null) {
-			for (Layer3DGL glLayer : glLayers) {
-				glLayer.initWithGLContext(colorProgram);
-			}
-		}
-		if (linesWay != null) {
-			linesWay.initWithGLContext(colorProgram);
-		}
-		if (glWays != null) {
-			for (WayGL way : glWays) {
-				way.initWithGLContext(colorProgram);
-			}
-		}
-		if (glUserPosition != null) {
-			glUserPosition.initWithGLContext(colorProgram);
-		}
-	}
-
 	private void initLayers() {
 		glLayers = new ArrayList<Layer3DGL>();
 		for (Layer3D layer : model.layers) {
@@ -92,40 +72,25 @@ public class Model3DGL implements IDrawableObject {
 		return modelLine;
 	}
 
-	@Override
 	public void draw(float[] mvpMatrix) {
-		if (visible) {
-			if (buildingVisible) {
-				if (glLayers != null) {
-					for (Layer3DGL layer : glLayers) {
-						layer.draw(mvpMatrix);
-					}
-				}
-			}
-			if (linesVisible) {
-				if (linesWay != null) {
-					linesWay.draw(mvpMatrix);
-				}
-			}
-			if (glWays != null) {
-				for (WayGL way : glWays) {
-					way.draw(mvpMatrix);
-				}
-			}
-			if (glUserPosition != null) {
-				glUserPosition.draw(mvpMatrix);
+		if (glLayers != null) {
+			for (Layer3DGL layer : glLayers) {
+				layer.draw(mvpMatrix, colorProgram);
 			}
 		}
-	}
-
-	@Override
-	public boolean isVisible() {
-		return visible;
-	}
-
-	@Override
-	public void setVisible(boolean visible) {
-		this.visible = visible;
+		if (linesVisible) {
+			if (linesWay != null) {
+				linesWay.draw(mvpMatrix, colorProgram);
+			}
+		}
+		if (glWays != null) {
+			for (WayGL way : glWays) {
+				way.draw(mvpMatrix, colorProgram);
+			}
+		}
+		if (glUserPosition != null) {
+			glUserPosition.draw(mvpMatrix, colorProgram);
+		}
 	}
 
 	public float getRatio() {
@@ -155,19 +120,23 @@ public class Model3DGL implements IDrawableObject {
 	}
 
 	public void setHeight(float height) {
-		model.height = height;
+		this.model.height = height;
 	}
 
 	public void setLength(float length) {
-		model.length = length;
+		this.model.length = length;
 	}
 
 	public void setWidth(float width) {
-		model.width = width;
+		this.model.width = width;
 	}
 
 	public void setUserPosition(Vector3D userPosition) {
 		this.userPosition.set(userPosition);
+	}
+
+	public void initWithGLContext(Context context) {
+		this.colorProgram = new AttributeColorShaderProgram(context);
 	}
 
 }

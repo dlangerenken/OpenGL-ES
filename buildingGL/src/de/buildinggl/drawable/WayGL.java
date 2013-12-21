@@ -49,13 +49,13 @@ public class WayGL implements IDrawableObject {
 	}
 
 	@Override
-	public void draw(float[] mvpMatrix) {
+	public void draw(float[] mvpMatrix, ShaderProgram program) {
 		if (isVisible) {
-			glWay.draw(mvpMatrix);
+			glWay.draw(mvpMatrix, program);
 			if (shouldAnimate) {
 				float[] animatedMatrix = Helper.animateObject(
 						animation.animate(), mvpMatrix);
-				animatedWay.draw(animatedMatrix);
+				animatedWay.draw(animatedMatrix, program);
 			}
 		}
 	}
@@ -68,14 +68,6 @@ public class WayGL implements IDrawableObject {
 	@Override
 	public void setVisible(boolean visible) {
 		this.isVisible = visible;
-	}
-
-	@Override
-	public void initWithGLContext(ShaderProgram program) {
-		glWay.initWithGLContext(program);
-		if (shouldAnimate) {
-			animatedWay.initWithGLContext(program);
-		}
 	}
 
 }

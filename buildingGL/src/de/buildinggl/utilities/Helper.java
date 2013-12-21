@@ -3,15 +3,12 @@ package de.buildinggl.utilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-import melb.mSafe.model.Triangle;
-import de.buildinggl.drawable.DrawableObject;
-import de.buildinggl.drawable.IDrawableObject;
 import android.content.Context;
 import android.content.res.Resources;
+import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 public class Helper {
 
@@ -73,7 +70,8 @@ public class Helper {
 		if (animateResult != null) {
 			Matrix.translateM(newMatrix, 0, animateResult[2], animateResult[3],
 					animateResult[4]);
-			rotateModel(newMatrix, null, null, animateResult[0], true, 20f, //TODO values
+			rotateModel(newMatrix, null, null, animateResult[0], true, 20f, // TODO
+																			// values
 					30f, 0f);
 		}
 		return newMatrix;
@@ -101,5 +99,27 @@ public class Helper {
 	public static float[] translateModel(float x, float y, float z,
 			float[] matrix) {
 		return translateModel(new float[] { x, y, z }, matrix);
+	}
+
+	/**
+	 * Utility method for debugging OpenGL calls. Provide the name of the call
+	 * just after making it:
+	 * 
+	 * <pre>
+	 * mColorHandle = GLES20.glGetUniformLocation(mProgram, &quot;vColor&quot;);
+	 * MyGLRenderer.checkGlError(&quot;glGetUniformLocation&quot;);
+	 * </pre>
+	 * 
+	 * If the operation is not successful, the check throws an error.
+	 * 
+	 * @param glOperation
+	 *            - Name of the OpenGL call to check.
+	 */
+	public static void checkGlError(String TAG, String glOperation) {
+		int error;
+		while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+			Log.e(TAG, glOperation + ": glError " + error);
+			throw new RuntimeException(glOperation + ": glError " + error);
+		}
 	}
 }

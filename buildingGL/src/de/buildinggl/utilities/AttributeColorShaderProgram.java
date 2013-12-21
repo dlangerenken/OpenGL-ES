@@ -15,15 +15,15 @@ import android.content.Context;
 import de.buildinggl.R;
 
 
-public class PositionShaderProgram extends ShaderProgram {
+public class AttributeColorShaderProgram extends ShaderProgram {
     // Uniform locations
     private final int uMatrixLocation;
-    private final int aColorLocation;
     
     // Attribute locations
     private final int aPositionLocation;    
+    private final int aColorLocation;
 
-    public PositionShaderProgram(Context context) {
+    public AttributeColorShaderProgram(Context context) {
         super(context, R.raw.simple_vertex_shader,
             R.raw.simple_fragment_shader);
 
@@ -35,7 +35,7 @@ public class PositionShaderProgram extends ShaderProgram {
         aColorLocation = glGetAttribLocation(program, A_COLOR);
     }
 
-    public void setUniforms(float[] matrix) {
+    public void setUniformMatrix(float[] matrix) {
         glUniformMatrix4fv(uMatrixLocation, 1, false, matrix, 0);
     }
 

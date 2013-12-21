@@ -38,20 +38,20 @@ public class UserPositionGL implements IDrawableObject {
 	}
 
 	@Override
-	public void draw(float[] mvpMatrix) {
+	public void draw(float[] mvpMatrix, ShaderProgram program) {
 		float[] translateMatrix = Helper.translateModel(new float[] {
 				userPosition.getX(), userPosition.getY(),
 				userPosition.getZ() + postionOffset }, mvpMatrix);
 		if (shouldAnimate) {
 			float[] newValues = animation.animate();
-			currentPositionRadius.draw(Helper.scaleModel(newValues,
-					translateMatrix));
+			currentPositionRadius.draw(
+					Helper.scaleModel(newValues, translateMatrix), program);
 		}
 		/*
 		 * first get center of arrow
 		 */
 		directionArrow.draw(Helper.translateModel(-10f * arrowScale, -15f
-				* arrowScale, 1f, translateMatrix));
+				* arrowScale, 1f, translateMatrix), program);
 	}
 
 	@Override
@@ -63,12 +63,5 @@ public class UserPositionGL implements IDrawableObject {
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
-
-	@Override
-	public void initWithGLContext(ShaderProgram program) {
-		currentPositionRadius.initWithGLContext(program);
-		directionArrow.initWithGLContext(program);
-	}
-
 
 }
