@@ -24,11 +24,16 @@ public class FloatBufferHelper {
 
 	public static float[] createCircle(int vertexCount, float radius,
 			float center_x, float center_y, float center_z, float[] circleColor) {
-		// create a buffer for vertex data
-		float buffer[] = new float[vertexCount * 7]; // (x,y,z,r,g,b,a) for each vertex
+		/*
+		 * create a buffer for vertex data
+		 */
+		float buffer[] = new float[vertexCount
+				* Constants.POSITION_COLOR_STRIDE];
 		int idx = 0;
 
-		// center vertex for triangle fan
+		/*
+		 * center vertex for triangle fan
+		 */
 		buffer[idx++] = center_x;
 		buffer[idx++] = center_y;
 		buffer[idx++] = center_z;
@@ -37,14 +42,18 @@ public class FloatBufferHelper {
 		buffer[idx++] = circleColor[2];
 		buffer[idx++] = circleColor[3];
 
-		// outer vertices of the circle
+		/*
+		 * outer vertices of the circle
+		 */
 		int outerVertexCount = vertexCount - 1;
 
 		for (int i = 0; i < outerVertexCount; ++i) {
 			float percent = (i / (float) (outerVertexCount - 1));
 			float rad = (float) (percent * 2 * Math.PI);
 
-			// vertex position
+			/*
+			 * vertex position
+			 */
 			float outer_x = (float) (center_x + radius * Math.cos(rad));
 			float outer_y = (float) (center_y + radius * Math.sin(rad));
 			float outer_z = center_z;
@@ -62,13 +71,17 @@ public class FloatBufferHelper {
 
 	public static float[] createArrow(float size, float[] color) {
 		List<Triangle> triangles = new ArrayList<Triangle>();
-		// first part of arrow
+		/*
+		 * first part of arrow
+		 */
 		triangles.add(new Triangle(new float[] { 25f * size, 15f * size, 0f,
 				color[0], color[1], color[2], color[3], 10f * size, 15f * size,
 				0f, color[0], color[1], color[2], color[3], 0f, 0f, 0f,
 				color[0], color[1], color[2], color[3] }, new float[] { 1.0f,
 				1.0f, 1.0f, 1.0f }));
-		// second part of arrow
+		/*
+		 * second part of arrow
+		 */
 		triangles.add(new Triangle(new float[] { 25f * size, 15f * size, 0f,
 				color[0], color[1], color[2], color[3], 0f, 30f * size, 0f,
 				color[0], color[1], color[2], color[3], 10f * size, 15f * size,
@@ -77,15 +90,19 @@ public class FloatBufferHelper {
 		return createPolygon(triangles);
 	}
 
-	public static float[] createPath(List<Vector3D> points) {
-		float[] vertices = new float[points.size() * 3];
+	public static float[] createPath(List<Vector3D> points, float[] color) {
+		float[] vertices = new float[points.size()
+				* Constants.POSITION_COLOR_STRIDE];
 		int counter = 0;
 		for (int i = 0; i < points.size(); i++) {
 			Vector3D vec = points.get(i);
 			vertices[counter++] = vec.getX();
 			vertices[counter++] = vec.getY();
 			vertices[counter++] = vec.getZ();
-			//TODO color missing
+			vertices[counter++] = color[0];
+			vertices[counter++] = color[1];
+			vertices[counter++] = color[2];
+			vertices[counter++] = color[3];
 		}
 		return vertices;
 	}
@@ -93,7 +110,12 @@ public class FloatBufferHelper {
 	public static float[] createPolygon(List<Triangle> triangles) {
 		float[] vertices = null;
 		for (Triangle triangle : triangles) {
-			vertices = concatAllFloat(vertices, triangle.getTrianglesSorted());
+			if (vertices == null) {
+				vertices = triangle.getTrianglesSorted();
+			} else {
+				vertices = concatAllFloat(vertices,
+						triangle.getTrianglesSorted());
+			}
 		}
 		return vertices;
 	}
@@ -110,9 +132,6 @@ public class FloatBufferHelper {
 	 *      -arrays-in-java}
 	 */
 	public static float[] concatAllFloat(float[]... arrays) {
-		if (arrays[0] == null) {
-			return arrays[1]; // TODO
-		}
 		int totalLength = 0;
 		final int subArrayCount = arrays.length;
 		for (int i = 0; i < subArrayCount; ++i) {
