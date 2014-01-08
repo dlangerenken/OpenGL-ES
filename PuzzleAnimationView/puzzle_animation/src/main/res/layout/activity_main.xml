@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.dala.puzzle_animation.MainActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <de.dala.puzzle_animation.PuzzleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/puzzleView"
+        android:layout_gravity="center"
+        android:focusableInTouchMode="true"
+        android:src="@drawable/example1"
+        app:hide_background="@drawable/shape"
+        app:cube_rows="10"
+        app:cube_columns="10"
+        app:puzzle_mode="click_random"
+        app:milliseconds_to_release="30000"/>
+    </FrameLayout>

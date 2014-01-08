@@ -40,6 +40,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	public static final String TAG = "MyGLRenderer";
 
 
+	private float[] mTemporaryMatrix = new float[16];
+	
 	/**
 	 * Store the model matrix. This matrix is used to move models from object
 	 * space (where each model can be thought of being located at the center of
@@ -68,7 +70,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private final float[] mViewMatrix = new float[16];
 
 	private float nearPlaneDistance = 1f;
-	private float farPlaneDistance = 200f;
+	private float farPlaneDistance = 50f;
 
 	private int offset = 0;
 	private float eyeX = 0;
@@ -147,10 +149,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		Helper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
 				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
 
+		
 		/*
 		 * Set the camera position (View matrix)
 		 */
-		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ / mZoomLevel,
+		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ,
 				centerX, centerY, centerZ, upX, upY, upZ);
 
 		/*
@@ -171,6 +174,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		float[] mMVPMatrix = new float[16];
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
+		
 		/*
 		 * all the drawing stuff inside the model-object (otherwise
 		 * translation/rotation wouldn't affect every object)
@@ -241,11 +245,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	}
 
 	public void downPressed() {
-		translateX -= 10;
+		translateZ -= 10;
 	}
 
 	public void upPressed() {
-		translateX += 10;
+		translateZ += 10;
 	}
 
 	public void actionMoved(float mPosX, float mPosY) {
