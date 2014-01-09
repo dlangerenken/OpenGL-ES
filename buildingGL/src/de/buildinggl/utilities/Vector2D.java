@@ -30,6 +30,15 @@ public class Vector2D {
 		return (float)Math.sqrt(x * x + y * y);
 	}
 
+	public Vector2D rotate(double angle) {
+		double sin = Math.sin(angle);
+		double cos = Math.cos(angle);
+		float nx = (float) (-cos * x + sin * y);
+		y = (float) (sin * x + cos * y);
+		x = nx;
+		return this;
+	}
+
 	public Vector2D set(Vector2D other) {
 		x = other.getX();
 		y = other.getY();

@@ -23,7 +23,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import de.buildinggl.drawable.Model3DGL;
-import de.buildinggl.utilities.Helper;
 import de.buildinggl.utilities.LoggerHelper;
 
 /**
@@ -39,9 +38,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	public static final String TAG = "MyGLRenderer";
 
-
 	private float[] mTemporaryMatrix = new float[16];
-	
+
 	/**
 	 * Store the model matrix. This matrix is used to move models from object
 	 * space (where each model can be thought of being located at the center of
@@ -70,7 +68,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	private final float[] mViewMatrix = new float[16];
 
 	private float nearPlaneDistance = 1f;
-	private float farPlaneDistance = 50f;
+	private float farPlaneDistance = 16f;
 
 	private int offset = 0;
 	private float eyeX = 0;
@@ -90,7 +88,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	 */
 	private float defaultRotationX = 100.0f;
 	private float defaultRotationZ = 180.0f;
-	
+
 	private float rotationX = defaultRotationX;
 	private float rotationY = 0.0f;
 	private float rotationZ = defaultRotationZ;
@@ -106,7 +104,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	public Model3DGL model3d;
 	private float[] backgroundColor = { 210f / 255f, 228f / 255f, 255f / 255f,
-			1.0f };
+	        1.0f };
 
 	private Context context;
 
@@ -119,16 +117,19 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 		// Set the background frame color
 		GLES20.glClearColor(backgroundColor[0], backgroundColor[1],
-				backgroundColor[2], backgroundColor[3]);
+		                    backgroundColor[2], backgroundColor[3]);
 		GLES20.glDisable(GLES20.GL_CULL_FACE);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 		model3d.initWithGLContext(context);
 	}
 
+	static private float tmpMatrix[] = new float[16];
+	static private float resMatrix[] = new float[16];
+
 	@Override
 	public void onDrawFrame(GL10 unused) {
 		LoggerHelper.calculateFPS();
-		
+
 		/*
 		 * Draw background color
 		 */
@@ -137,25 +138,48 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		/*
 		 * scale model down to smaller values
 		 */
+		float r =  model3d.getRatio() ;
+		float s = mZoomLevel;
 		Matrix.setIdentityM(mModelMatrix, 0);
-		Matrix.scaleM(mModelMatrix, 0, model3d.getRatio() * scaleFactor,
-				model3d.getRatio() * scaleFactor, model3d.getRatio()
-						* scaleFactor);
 
-		/*
-		 * rotate and translate model in dependence to the user input
-		 */
-		Matrix.translateM(mModelMatrix, 0, translateX, translateY, translateZ);
-		Helper.rotateModel(mModelMatrix, rotationX, rotationY, rotationZ, true,
-				model3d.getWidth(), model3d.getLength(), model3d.getHeight());
+		// move model origin to its center
+		Matrix.setIdentityM(tmpMatrix, 0);
+		Matrix.translateM(tmpMatrix, 0, -model3d.getWidth()/ 2f, 
+		                  -model3d.getLength()/ 2f, 
+		                  -model3d.getHeight()/ 2f);
+		Matrix.multiplyMM(resMatrix, 0, tmpMatrix, 0, mModelMatrix, 0);
+		System.arraycopy(resMatrix, 0, mModelMatrix, 0, 16);
 
+		// translate to world position
+		 Matrix.setIdentityM(tmpMatrix, 0);
+		 Matrix.translateM(tmpMatrix, 0, translateX, translateY, translateZ);
+		 Matrix.multiplyMM(resMatrix, 0, tmpMatrix, 0, mModelMatrix, 0);
+		 System.arraycopy(resMatrix, 0, mModelMatrix, 0, 16);
+
+		// rotate around center
+		Matrix.setIdentityM(tmpMatrix, 0);
+		if (rotationX != 0)
+			Matrix.rotateM(tmpMatrix, 0, rotationX, 1.0f, 0.0f, 0.0f);
+		if (rotationY != 0)
+			Matrix.rotateM(tmpMatrix, 0, rotationY, 0.0f, 1.0f, 0.0f);
+		if (rotationZ != 0)
+			Matrix.rotateM(tmpMatrix, 0, rotationZ, 0.0f, 0.0f, 1.0f);
+
+		Matrix.multiplyMM(resMatrix, 0, tmpMatrix, 0, mModelMatrix, 0);
+		System.arraycopy(resMatrix, 0, mModelMatrix, 0, 16);
+		 
+		// scale down
+		Matrix.setIdentityM(tmpMatrix, 0);
+		Matrix.scaleM(tmpMatrix, 0, r * s, r * s, r * s);
+		Matrix.multiplyMM(resMatrix, 0, tmpMatrix, 0, mModelMatrix, 0);
+		System.arraycopy(resMatrix, 0, mModelMatrix, 0, 16);
 		
 		/*
 		 * Set the camera position (View matrix)
 		 */
 		Matrix.setLookAtM(mViewMatrix, offset, eyeX, eyeY, eyeZ,
-				centerX, centerY, centerZ, upX, upY, upZ);
-
+		                  centerX, centerY, centerZ, upX, upY, upZ);
+		
 		/*
 		 * combine the model with the view matrix
 		 */
@@ -166,7 +190,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		 * onDrawFrame() method
 		 */
 		Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, 1, -1,
-				nearPlaneDistance, farPlaneDistance);
+		               nearPlaneDistance, farPlaneDistance);
 
 		/*
 		 * Calculate the projection and view transformation
@@ -174,7 +198,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		float[] mMVPMatrix = new float[16];
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
 
-		
 		/*
 		 * all the drawing stuff inside the model-object (otherwise
 		 * translation/rotation wouldn't affect every object)
@@ -185,15 +208,14 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 unused, int width, int height) {
 		/*
-		 *  Adjust the viewport based on geometry changes,
-		 *  such as screen rotation
+		 * Adjust the viewport based on geometry changes, such as screen
+		 * rotation
 		 */
 		GLES20.glViewport(0, 0, width, height);
 		this.width = width;
 		this.height = height;
 		ratio = (float) width / height;
 	}
-
 
 	public void setZoom(float zoom) {
 		this.mZoomLevel = zoom;

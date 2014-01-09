@@ -67,7 +67,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 			touchManager.update(event);
 
 			if (touchManager.getPressCount() == 1) {
-				position.add(touchManager.moveDelta(0));
+				position.add(touchManager.moveDelta(0).rotate(-angle));
 			} else {
 				if (touchManager.getPressCount() == 2) {
 
@@ -96,10 +96,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
 			isInitialized = true;
 		}
 
-		mRenderer.setTranslation(-width / 2.0f, null, -height / 2.0f);
+		//mRenderer.setTranslation(-width / 2.0f, null, -height / 2.0f);
 		mRenderer.setRotation(null, null, getDegreesFromRadians(angle));
 		mRenderer.setScale(scale);
-		mRenderer.setTranslation(position.getX(), null, position.getY());
+		//mRenderer.setTranslation(position.getX(), null, position.getY());
+		mRenderer.setTranslation( position.getX(), position.getY(),
+		                         model3dGl.getHeight() * 2);
 		return true;
 	}
 
