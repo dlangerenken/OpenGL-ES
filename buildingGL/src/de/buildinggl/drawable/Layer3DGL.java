@@ -48,10 +48,10 @@ public class Layer3DGL implements IDrawableObject {
 	}
 
 	@Override
-	public void draw(float[] mvpMatrix, ShaderProgram program) {
+	public void draw(float[] modelViewProjectionMatrix, ShaderProgram program) {
 		if (visible) {
 			for (IDrawableObject drawableObject : drawableObjects) {
-				drawableObject.draw(mvpMatrix, program);
+				drawableObject.draw(modelViewProjectionMatrix, program);
 			}
 		}
 	}

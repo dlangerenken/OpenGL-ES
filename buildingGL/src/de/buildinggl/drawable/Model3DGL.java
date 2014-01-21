@@ -5,9 +5,7 @@ import java.util.List;
 
 import melb.mSafe.model.Layer3D;
 import melb.mSafe.model.Model3D;
-import melb.mSafe.model.Node;
 import melb.mSafe.model.Vector3D;
-import melb.mSafe.model.Way;
 import android.content.Context;
 import android.opengl.GLES20;
 import de.buildinggl.utilities.AttributeColorShaderProgram;
@@ -18,38 +16,22 @@ public class Model3DGL {
 	private float modelRatio = 1.0f;
 	private Model3D model;
 	private IDrawableObject linesWay;
-	private List<WayGL> glWays;
-	private Vector3D userPosition;
+	public Vector3D userPosition;
 	private IDrawableObject glUserPosition;
 	private AttributeColorShaderProgram colorProgram;
 
-	public Model3DGL(Model3D model) {
+	public Model3DGL(Model3D model, Vector3D userPosition) {
 		this.model = model;
+		this.userPosition = userPosition;
 		getModelRatio();
 		initLayers();
-		// initWays(); //TODO bugfix needed
 		initUserPosition();
 	}
 
 	private void initUserPosition() {
-		userPosition = new Vector3D(0f, 0f, 0f);
 		glUserPosition = new UserPositionGL(true, userPosition);
 	}
 
-	private void initWays() {
-		glWays = new ArrayList<WayGL>();
-		List<Node> nodes = new ArrayList<Node>();
-		int counter = 0;
-		nodes.add(new Node(0, 0, 0, 0));
-		nodes.add(new Node(counter++, model.length, 0, 0));
-		nodes.add(new Node(counter++, model.length, model.width, 0));
-		nodes.add(new Node(counter++, 0, model.width, 0));
-		nodes.add(new Node(counter++, 0, 0, 0));
-
-		Way way = new Way(nodes);
-		glWays.add(new WayGL(way, new float[] { 1.0f, 0.0f, 0.0f, 1.0f }, true,
-				10000));
-	}
 
 	private void initLayers() {
 		glLayers = new ArrayList<Layer3DGL>();
@@ -72,25 +54,21 @@ public class Model3DGL {
 		return modelLine;
 	}
 
-	public void draw(float[] mvpMatrix) {
+	public void draw(float[] modelViewProjectionMatrix) {
 		if (glLayers != null) {
 			for (Layer3DGL layer : glLayers) {
-				layer.draw(mvpMatrix, colorProgram);
+				layer.draw(modelViewProjectionMatrix, colorProgram);
 			}
 		}
 		if (linesVisible) {
 			if (linesWay != null) {
-				linesWay.draw(mvpMatrix, colorProgram);
-			}
-		}
-		if (glWays != null) {
-			for (WayGL way : glWays) {
-				way.draw(mvpMatrix, colorProgram);
+				linesWay.draw(modelViewProjectionMatrix, colorProgram);
 			}
 		}
 		if (glUserPosition != null) {
-			glUserPosition.draw(mvpMatrix, colorProgram);
+			glUserPosition.draw(modelViewProjectionMatrix, colorProgram);
 		}
+		
 	}
 
 	public float getRatio() {
@@ -131,12 +109,13 @@ public class Model3DGL {
 		this.model.width = width;
 	}
 
-	public void setUserPosition(Vector3D userPosition) {
-		this.userPosition.set(userPosition);
-	}
-
 	public void initWithGLContext(Context context) {
 		this.colorProgram = new AttributeColorShaderProgram(context);
+	}
+
+	public void setUserPosition(Vector3D userPosition) {
+		this.userPosition = userPosition;
+		((UserPositionGL)glUserPosition).setUserPosition(userPosition);
 	}
 
 }

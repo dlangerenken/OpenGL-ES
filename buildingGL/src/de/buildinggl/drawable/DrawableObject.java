@@ -51,12 +51,12 @@ public class DrawableObject implements IDrawableObject {
 	 * @param mvpMatrix
 	 *            - The Model View Project matrix in which to draw this shape.
 	 */
-	public void draw(float[] mvpMatrix, ShaderProgram program) {
+	public void draw(float[] drawMatrix, ShaderProgram program) {
 		program.useProgram();
 
 		if (program instanceof AttributeColorShaderProgram) {
 			AttributeColorShaderProgram positionProgram = (AttributeColorShaderProgram) program;
-			positionProgram.setUniformMatrix(mvpMatrix);
+			positionProgram.setUniformMatrix(drawMatrix);
 		}
 
 		bindData(program);

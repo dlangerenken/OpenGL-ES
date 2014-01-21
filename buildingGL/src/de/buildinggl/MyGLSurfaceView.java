@@ -35,16 +35,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	private TouchManager touchManager = new TouchManager(2);
 	private boolean isInitialized = false;
 
-	private static float getDegreesFromRadians(float angle) {
-		return (float) (angle * 180.0 / Math.PI);
-	}
-
-	private float width;
-	private float height;
 	private final MyGLRenderer mRenderer;
 	private Model3DGL model3dGl;
+	private OpenGLViewFragment fragment;
 
-	public MyGLSurfaceView(Context context, Model3DGL model3dGl) {
+	public MyGLSurfaceView(Context context, Model3DGL model3dGl,
+			OpenGLViewFragment openGLViewFragment) {
 		super(context);
 		this.model3dGl = model3dGl;
 
@@ -61,32 +57,26 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		this.width = model3dGl.getWidth();
-		this.height = model3dGl.getLength(); // model length = onTouch Height
 		try {
 			touchManager.update(event);
 
 			if (touchManager.getPressCount() == 1) {
 				position.add(touchManager.moveDelta(0).rotate(-angle));
-			} else {
-				if (touchManager.getPressCount() == 2) {
+			} else if (touchManager.getPressCount() == 2) {
+				Vector2D current = touchManager.getVector(0, 1);
+				Vector2D previous = touchManager.getPreviousVector(0, 1);
+				float currentDistance = current.getLength();
+				float previousDistance = previous.getLength();
 
-					Vector2D current = touchManager.getVector(0, 1);
-					Vector2D previous = touchManager.getPreviousVector(0, 1);
-					float currentDistance = current.getLength();
-					float previousDistance = previous.getLength();
-
-					if (previousDistance != 0) {
-						scale *= currentDistance / previousDistance;
-					}
-
-					angle -= Vector2D.getSignedAngleBetween(current, previous);
+				if (previousDistance != 0) {
+					scale *= currentDistance / previousDistance;
 				}
+				angle -= Vector2D.getSignedAngleBetween(current, previous);
 			}
 
 			invalidate();
 		} catch (Throwable t) {
-//			throw new RuntimeException(t);
+			// throw new RuntimeException(t);
 		}
 
 		if (!isInitialized) {
@@ -96,12 +86,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
 			isInitialized = true;
 		}
 
-		//mRenderer.setTranslation(-width / 2.0f, null, -height / 2.0f);
-		mRenderer.setRotation(null, null, getDegreesFromRadians(angle));
+		mRenderer.setRotation(null, null, (float) Math.toDegrees(angle));
 		mRenderer.setScale(scale);
-		//mRenderer.setTranslation(position.getX(), null, position.getY());
-		mRenderer.setTranslation( position.getX(), position.getY(),
-		                         model3dGl.getHeight() * 2);
+		mRenderer.setTranslation(position.getX(), position.getY(), null);
 		return true;
 	}
 

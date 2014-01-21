@@ -1,11 +1,11 @@
 package de.buildinggl.drawable;
 
+import melb.mSafe.model.Vector3D;
+import android.opengl.GLES20;
 import de.buildinggl.animation.SizeAnimation;
 import de.buildinggl.utilities.FloatBufferHelper;
 import de.buildinggl.utilities.Helper;
 import de.buildinggl.utilities.ShaderProgram;
-import android.opengl.GLES20;
-import melb.mSafe.model.Vector3D;
 
 public class UserPositionGL implements IDrawableObject {
 
@@ -39,19 +39,21 @@ public class UserPositionGL implements IDrawableObject {
 
 	@Override
 	public void draw(float[] mvpMatrix, ShaderProgram program) {
-		float[] translateMatrix = Helper.translateModel(new float[] {
-				userPosition.getX(), userPosition.getY(),
-				userPosition.getZ() + postionOffset }, mvpMatrix);
-		if (shouldAnimate) {
-			float[] newValues = animation.animate();
-			currentPositionRadius.draw(
-					Helper.scaleModel(newValues, translateMatrix), program);
+		if (userPosition != null) {
+			float[] translateMatrix = Helper.translateModel(
+					new float[] { userPosition.getX(), userPosition.getY(),
+							userPosition.getZ() + postionOffset }, mvpMatrix);
+			if (shouldAnimate) {
+				float[] newValues = animation.animate();
+				currentPositionRadius.draw(
+						Helper.scaleModel(newValues, translateMatrix), program);
+			}
+			/*
+			 * first get center of arrow
+			 */
+			directionArrow.draw(Helper.translateModel(-10f * arrowScale, -15f
+					* arrowScale, 1f, translateMatrix), program);
 		}
-		/*
-		 * first get center of arrow
-		 */
-		directionArrow.draw(Helper.translateModel(-10f * arrowScale, -15f
-				* arrowScale, 1f, translateMatrix), program);
 	}
 
 	@Override
@@ -62,6 +64,10 @@ public class UserPositionGL implements IDrawableObject {
 	@Override
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+
+	public void setUserPosition(Vector3D userPosition2) {
+		this.userPosition = userPosition2;
 	}
 
 }

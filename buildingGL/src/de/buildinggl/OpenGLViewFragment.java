@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -32,8 +33,14 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 	private MyGLRenderer mGLRenderer;
 	private Model3DGL model3d;
 	private CustomSeekBar seekBarX;
+	private CustomSeekBar seekBarZ;
 	private LinearLayout listOfFloors;
 	private RouteGraph routeGraph;
+
+	private TextView rotation;
+	private TextView scale;
+	private TextView translate;
+	Vector3D mUserPosition = new Vector3D(1, 1f, 1f);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,13 +54,57 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 		FrameLayout rootView = (FrameLayout) inflater.inflate(R.layout.gl_view,
 				null);
 		if (hasGLES20()) {
-			mGLView = new MyGLSurfaceView(getActivity(), model3d);
+			mGLView = new MyGLSurfaceView(getActivity(), model3d, this);
 			rootView.addView(mGLView, 0);
 		}
 		listOfFloors = (LinearLayout) rootView.findViewById(R.id.listOfFloors);
+		rotation = (TextView) rootView.findViewById(R.id.rotation);
+		scale = (TextView) rootView.findViewById(R.id.scale);
+		translate = (TextView) rootView.findViewById(R.id.translate);
 		initListView();
 		initSeekBars(rootView);
 		return rootView;
+	}
+
+	public void setScale(final float scaleFloat) {
+		if (scale != null) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					scale.setText(String.format("scale: x=%s;", scaleFloat));
+				}
+			});
+
+		}
+	}
+
+	public void setRotation(final float x, final float y, final float z) {
+		if (rotation != null) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					rotation.setText(String.format(
+							"rotation: x=%s; y=%s; z=%s", x, y, z));
+
+				}
+			});
+		}
+	}
+
+	public void setTranslation(final float x, final float y, final float z) {
+		getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (translate != null) {
+					translate.setText(String.format(
+							"translation: x=%s; y=%s; z=%s", x, y, z));
+				}
+
+			}
+		});
 	}
 
 	private void initListView() {
@@ -74,12 +125,13 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 
 	private void initSeekBars(FrameLayout rootView) {
 		seekBarX = (CustomSeekBar) rootView.findViewById(R.id.seekBarX);
+		seekBarZ = (CustomSeekBar) rootView.findViewById(R.id.seekBarZ);
 		if (mGLView != null) {
 			mGLRenderer = mGLView.getRenderer();
 
 			seekBarX.setMin(0);
 			seekBarX.setMax(80);
-			seekBarX.setProgress((int) (mGLRenderer.getRotationX() - mGLRenderer
+			seekBarX.setProgress((int)(mGLRenderer.getRotationX() - mGLRenderer
 					.getDefaultRotationX()));
 			seekBarX.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				@Override
@@ -97,6 +149,26 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 
 				}
 			});
+			
+			seekBarZ.setMin(-600);
+			seekBarZ.setMax(600);
+			seekBarZ.setProgress((int) (mGLRenderer.getDistance()));
+			seekBarZ.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {
+				}
+
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) {
+				}
+
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress,
+						boolean fromUser) {
+					mGLRenderer.setTranslation(null, null,(float) progress);
+
+				}
+			});
 		}
 	}
 
@@ -104,7 +176,7 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 		try {
 			Model3D model = new Gson().fromJson(Helper.getStringFromRaw(
 					getActivity(), R.raw.building_model), Model3D.class);
-			model3d = new Model3DGL(model);
+			model3d = new Model3DGL(model, mUserPosition);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -149,6 +221,11 @@ public class OpenGLViewFragment extends Fragment implements IUserPosition {
 
 	@Override
 	public void userPositionChanged(Vector3D userPosition) {
-		model3d.setUserPosition(userPosition);
+		if (mUserPosition != null && userPosition != null){
+			mUserPosition.set(userPosition);
+		}else if (userPosition != null){
+			mUserPosition = userPosition;
+		}
+		model3d.setUserPosition(mUserPosition);
 	}
 }

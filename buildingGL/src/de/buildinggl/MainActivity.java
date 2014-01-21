@@ -1,14 +1,13 @@
 package de.buildinggl;
 
+import melb.mSafe.model.Vector3D;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 	private OpenGLViewFragment fragment;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,11 +28,9 @@ public class MainActivity extends FragmentActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
 			fragment.downPressed();
-			Toast.makeText(this, "down", Toast.LENGTH_SHORT).show();
 		}
 		if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
 			fragment.upPressed();
-			Toast.makeText(this, "up", Toast.LENGTH_SHORT).show();
 		}
 		return true;
 	}
