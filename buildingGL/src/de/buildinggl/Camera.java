@@ -2,6 +2,7 @@ package de.buildinggl;
 
 import melb.mSafe.model.Vector3D;
 import android.opengl.Matrix;
+import de.buildinggl.animation.PathAnimation;
 
 public class Camera {
 
@@ -9,9 +10,10 @@ public class Camera {
 	private Vector3D mRotationVector;
 	private Vector3D mLookAtVector;
 	private float[] mModelMatrix;
-	private boolean recalculate = true;
-	private int offset = 0;
-	private float[] lookingTo;
+	private boolean mRecalculate = true;
+	private int mOffset = 0;
+	private float[] mLookingTo;
+	private PathAnimation mPathAnimation;
 
 	public Camera() {
 		mDistance = 2;
@@ -22,21 +24,29 @@ public class Camera {
 	}
 
 	public float[] getViewMatrix() {
-		if (recalculate) {
-			lookingTo = new float[16];
+		if (mRecalculate) {
+			mLookingTo = new float[16];
+			float[] currentTarget = null;
+			if (mPathAnimation != null && mPathAnimation.isRunnning()){
+				float[] values = new float[6];
+				values = mPathAnimation.animate();
+				currentTarget = new float[] { mLookAtVector.getX() + values[2],
+						mLookAtVector.getY() + values[3], mLookAtVector.getZ() + values[4], 1 };
+			}else{
+				currentTarget = new float[] { mLookAtVector.getX(),
+						mLookAtVector.getY(), mLookAtVector.getZ(), 1 };
+			}
 			/*
 			 * Set the camera position (View matrix)
 			 */
-			float[] currentTarget = new float[] { mLookAtVector.getX(),
-					mLookAtVector.getY(), mLookAtVector.getZ(), 1 };
 			float[] targetVector = new float[4];
 			Matrix.multiplyMV(targetVector, 0, mModelMatrix, 0, currentTarget,
 					0);
 			Vector3D transformedTarget = new Vector3D(targetVector[0],
 					targetVector[1], targetVector[2]);
-			lookingTo = getLookAtM(transformedTarget);
+			mLookingTo = getLookAtM(transformedTarget);
 		}
-		return lookingTo;
+		return mLookingTo;
 	}
 
 	private float[] getLookAtM(Vector3D lookAtTarget) {
@@ -57,17 +67,17 @@ public class Camera {
 		Vector3D lookAt = lookAtTarget;
 		Vector3D up = new Vector3D(0.0f, 1.0f, 0.0f);
 
-		Matrix.setLookAtM(lookingTo, offset, eyePt.getX(), eyePt.getY(),
+		Matrix.setLookAtM(lookingTo, mOffset, eyePt.getX(), eyePt.getY(),
 				eyePt.getZ(), lookAt.getX(), lookAt.getY(), lookAt.getZ(),
 				up.getX(), up.getY(), up.getZ());
 
-		recalculate = false;
+		mRecalculate = false;
 		return lookingTo;
 	}
 
 	public void setLookAtPosition(Vector3D lookAtVector) {
 		mLookAtVector = lookAtVector;
-		recalculate = true;
+		mRecalculate = true;
 	}
 
 	public void setDistance(float distance) {
@@ -76,11 +86,17 @@ public class Camera {
 
 	public void setRotation(Vector3D rotationVector) {
 		mRotationVector = rotationVector;
-		recalculate = true;
+		mRecalculate = true;
 	}
 
 	public void setModelMatrix(float[] modelMatrix) {
 		mModelMatrix = modelMatrix;
-		recalculate = true;
+		mRecalculate = true;
+	}
+
+	public void setAnimation(PathAnimation pathAnimation) {
+		mPathAnimation = pathAnimation;
+		mPathAnimation.start();
+		mRecalculate = true;
 	}
 }

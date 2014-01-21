@@ -6,6 +6,14 @@ import java.util.List;
 import melb.mSafe.model.Vector3D;
 
 public class PathAnimation {
+	public boolean isRunnning() {
+		return isRunnning;
+	}
+
+	public void setRunnning(boolean isRunnning) {
+		this.isRunnning = isRunnning;
+	}
+
 	public static final int INFINITY = -1;
 	private static final float epsilon = 0.1f;
 
@@ -92,7 +100,7 @@ public class PathAnimation {
 					nextVector++;
 					if (nextVector >= pointsOnPath.size()) {
 						isFinished();
-						return null;
+						return new float[]{0,0,0,0,0};
 					}
 					nextPathElement = pointsOnPath.get(nextVector);
 					distanceToNextPathElement = Vector3D.getDistance(
@@ -117,7 +125,7 @@ public class PathAnimation {
 				return lastValues;
 			}
 		}
-		return null;
+		return new float[]{0,0,0,0,0};
 	}
 
 	private void isFinished() {

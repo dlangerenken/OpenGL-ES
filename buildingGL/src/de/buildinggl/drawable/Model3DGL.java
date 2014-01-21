@@ -19,6 +19,7 @@ public class Model3DGL {
 	public Vector3D userPosition;
 	private IDrawableObject glUserPosition;
 	private AttributeColorShaderProgram colorProgram;
+	private IDrawableObject way;
 
 	public Model3DGL(Model3D model, Vector3D userPosition) {
 		this.model = model;
@@ -26,12 +27,23 @@ public class Model3DGL {
 		getModelRatio();
 		initLayers();
 		initUserPosition();
+		initWay();
+	}
+
+	private void initWay() {
+		List<Vector3D> points = new ArrayList<Vector3D>();
+		points.add(new Vector3D(0, 0, 0));
+		points.add(new Vector3D(model.length, 0f, 0f));
+		points.add(new Vector3D(model.length, model.width, 0f));
+		points.add(new Vector3D(0f, model.width, 0f));
+		points.add(new Vector3D(0, 0, 0));
+		way = new WayGL(points, new float[] { 0.0f, 1.0f, 0.0f, 1.0f }, true,
+				30000);
 	}
 
 	private void initUserPosition() {
 		glUserPosition = new UserPositionGL(true, userPosition);
 	}
-
 
 	private void initLayers() {
 		glLayers = new ArrayList<Layer3DGL>();
@@ -68,7 +80,10 @@ public class Model3DGL {
 		if (glUserPosition != null) {
 			glUserPosition.draw(modelViewProjectionMatrix, colorProgram);
 		}
-		
+		if (way != null) {
+			way.draw(modelViewProjectionMatrix, colorProgram);
+		}
+
 	}
 
 	public float getRatio() {
@@ -115,7 +130,7 @@ public class Model3DGL {
 
 	public void setUserPosition(Vector3D userPosition) {
 		this.userPosition = userPosition;
-		((UserPositionGL)glUserPosition).setUserPosition(userPosition);
+		((UserPositionGL) glUserPosition).setUserPosition(userPosition);
 	}
 
 }

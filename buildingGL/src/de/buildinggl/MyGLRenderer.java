@@ -15,6 +15,9 @@
  */
 package de.buildinggl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -23,6 +26,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import de.buildinggl.animation.PathAnimation;
 import de.buildinggl.drawable.Model3DGL;
 import de.buildinggl.utilities.LoggerHelper;
 
@@ -167,7 +171,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		Matrix.multiplyMM(resMatrix, 0, tmpMatrix, 0, mModelMatrix, 0);
 		System.arraycopy(resMatrix, 0, mModelMatrix, 0, 16);
 
-		//stick camera to modelmatrix
+		// stick camera to modelmatrix
 		if (focusOnTarget) {
 			camera.setModelMatrix(mModelMatrix);
 			camera.setLookAtPosition(model3d.userPosition);
@@ -179,7 +183,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 		/*
 		 * combine the model with the view matrix
 		 */
-		//Matrix.setIdentityM(mModelMatrix, 0); // debuh
+		// Matrix.setIdentityM(mModelMatrix, 0); // debuh
 		Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
 
 		/*
@@ -265,12 +269,22 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 	public void downPressed() {
 		focusOnTarget = false;
-//		model3d.userPosition.add(new Vector3D(1, 0, 0));
+		// model3d.userPosition.add(new Vector3D(1, 0, 0));
 	}
 
 	public void upPressed() {
 		focusOnTarget = true;
-//		model3d.userPosition.add(new Vector3D(0, 1, 0));
+		int timeToFinish = 30000;
+		List<Vector3D> points = new ArrayList<Vector3D>();
+		points.add(new Vector3D(0, 0, 0));
+		points.add(new Vector3D(model3d.getLength(), 0f, 0f));
+		points.add(new Vector3D(model3d.getLength(), model3d.getWidth(), 0f));
+		points.add(new Vector3D(0f, model3d.getWidth(), 0f));
+		points.add(new Vector3D(0, 0, 0));
+
+		camera.setAnimation(new PathAnimation(timeToFinish,
+				PathAnimation.INFINITY, points));
+		// model3d.userPosition.add(new Vector3D(0, 1, 0));
 	}
 
 	public void actionMoved(float mPosX, float mPosY) {
